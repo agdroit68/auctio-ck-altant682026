@@ -1,0 +1,2270 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Auctio Mobile</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Auctio">
+<meta name="theme-color" content="#0a0b1e">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-180.png">
+<style>
+  :root {
+    --nuit: #1a1d3f; --nuit2: #141633; --noir: #0a0b1e;
+    --accent: #304090; --accent2: #6e3a86;
+    --etude-b1: #304090; --etude-b2: #603078;
+    --ocean1: #1e8fb8; --ocean2: #16b58a;
+    --bg: #f2f3f9; --card: #ffffff; --border: #e3e5f0;
+    --text: #23253f; --text2: #565b80; --text3: #9094b4;
+    --ok: #16a34a; --ok-light: #e7f6ec;
+    --warn: #b4892a; --warn-light: #fdf3dd; --danger: #b43a3a;
+    --sat: env(safe-area-inset-top, 0px); --sab: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body { font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.45; overscroll-behavior: none; -webkit-user-select: none; user-select: none; }
+  input, textarea, select { -webkit-user-select: text; user-select: text; }
+
+  .topbar { position: sticky; top: 0; z-index: 50; background: linear-gradient(180deg, var(--nuit), var(--nuit2)); color: #fff; padding: calc(var(--sat) + 12px) 16px 12px; display: flex; align-items: center; gap: 10px; }
+  .topbar .back { background: rgba(255,255,255,0.12); border: none; color: #fff; width: 34px; height: 34px; border-radius: 10px; font-size: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .topbar .titre { font-weight: 700; font-size: 16px; letter-spacing: 0.3px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .topbar .sous { font-size: 11px; color: #a9acd0; font-weight: 500; }
+  .brand { display: inline-flex; align-items: baseline; gap: 7px; }
+  .brand .a { font-weight: 800; letter-spacing: 4px; font-variant: small-caps; font-size: 18px; }
+  .brand .m { font-weight: 700; letter-spacing: 1.5px; font-size: 9px; text-transform: uppercase; color: #fff; background: linear-gradient(135deg, var(--accent), var(--accent2)); padding: 2px 7px; border-radius: 6px; align-self: center; }
+  .topbar .logo-mini { height: 24px; width: auto; flex-shrink: 0; filter: brightness(0) invert(1); opacity: .95; margin-right: 2px; }
+
+  .contenu { padding: 16px 16px calc(var(--sab) + 90px); max-width: 560px; margin: 0 auto; }
+
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 14px; }
+  .card-titre { font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text2); margin-bottom: 12px; }
+  .vide { text-align: center; color: var(--text3); padding: 36px 16px; font-size: 14px; }
+  .vide strong { display: block; color: var(--text2); font-size: 15px; margin-bottom: 6px; }
+
+  .vente-item { display: flex; align-items: center; gap: 12px; width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; text-align: left; font-family: inherit; color: inherit; }
+  .vente-item:active { background: #f6f6fc; }
+  .vente-item .ic { width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 17px; }
+  .vente-item .vi-nom { font-weight: 700; font-size: 15px; }
+  .vente-item .vi-meta { font-size: 12px; color: var(--text3); margin-top: 2px; }
+  .vente-item .vi-fleche { margin-left: auto; color: var(--text3); font-size: 18px; }
+  .tag-cloture { font-size: 10px; font-weight: 700; color: var(--ok); background: var(--ok-light); padding: 2px 8px; border-radius: 99px; margin-left: 6px; vertical-align: 1px; }
+
+  label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 5px; }
+  .champ { width: 100%; border: 1.5px solid var(--border); border-radius: 12px; padding: 12px 13px; font-size: 16px; font-family: inherit; background: #fff; color: var(--text); }
+  .champ:focus { outline: none; border-color: var(--accent); }
+  .fgroupe { margin-bottom: 14px; }
+  .grille2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  select.champ { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23565b80' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
+
+  .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; border: none; border-radius: 14px; padding: 15px; font-size: 16px; font-weight: 700; font-family: inherit; color: #fff; background: var(--accent); transition: transform .08s; }
+  .btn:active { transform: scale(0.98); }
+  .btn.violet { background: linear-gradient(135deg, var(--accent2), #8a4ba6); }
+  .btn.vert { background: var(--ok); }
+  .btn.ghost { background: #fff; color: var(--text2); border: 1.5px solid var(--border); }
+  .btn.danger-ghost { background: #fff; color: var(--danger); border: 1.5px solid #ecc9c9; }
+  .btn.petit { padding: 10px; font-size: 14px; border-radius: 12px; }
+  .btn:disabled { opacity: 0.45; }
+
+  .actions-dash { display: grid; gap: 11px; margin-bottom: 16px; }
+  .action-btn { position: relative; overflow: hidden; width: 100%; border: none; border-radius: 16px; padding: 15px 16px; font-family: inherit; color: #fff; display: flex; align-items: center; gap: 13px; text-align: left; box-shadow: 0 4px 14px rgba(26,29,63,.18); transition: transform .1s; }
+  .action-btn:active { transform: scale(0.985); }
+  .action-btn .ab-ic { width: 40px; height: 40px; flex-shrink: 0; border-radius: 12px; background: rgba(255,255,255,.18); display: flex; align-items: center; justify-content: center; }
+  .action-btn .ab-ic svg { width: 22px; height: 22px; stroke: #fff; }
+  .action-btn .ab-t { font-weight: 800; font-size: 15px; }
+  .action-btn .ab-s { font-size: 11.5px; opacity: .85; font-weight: 500; margin-top: 1px; }
+  .action-btn .ab-fleche { margin-left: auto; font-size: 20px; opacity: .7; }
+  .action-btn::after { content: ""; position: absolute; top: 0; left: -60%; width: 45%; height: 100%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.32), transparent); transform: skewX(-18deg); animation: reflet 4.5s ease-in-out infinite; }
+  @keyframes reflet { 0%,55% { left: -60%; } 78%,100% { left: 130%; } }
+  .action-btn.b-lot { background: linear-gradient(135deg, #2b57a8, #2f8fb0); }
+  .action-btn.b-adj { background: linear-gradient(135deg, #b4892a, #d1a83f); box-shadow: 0 4px 14px rgba(180,137,42,.22); }
+  .action-btn.b-live { background: linear-gradient(135deg, var(--etude-b1), var(--etude-b2)); }
+
+  .cta-live { position: relative; overflow: hidden; width: 100%; border: none; border-radius: 18px; padding: 20px; font-family: inherit; color: #fff; margin-bottom: 18px; background: linear-gradient(135deg, var(--etude-b1), var(--etude-b2)); display: flex; align-items: center; gap: 14px; box-shadow: 0 8px 24px rgba(48,64,144,.32); animation: pulseLive 2.8s ease-in-out infinite; }
+  @keyframes pulseLive { 0%,100% { box-shadow: 0 8px 24px rgba(48,64,144,.32); } 50% { box-shadow: 0 8px 30px rgba(110,58,134,.5); } }
+  .cta-live:active { transform: scale(0.985); }
+  .cta-live::after { content: ""; position: absolute; top: 0; left: -60%; width: 40%; height: 100%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.35), transparent); transform: skewX(-18deg); animation: reflet 3.8s ease-in-out infinite; }
+  .cta-live .cl-ic { width: 46px; height: 46px; border-radius: 14px; background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .cta-live .cl-ic svg { width: 26px; height: 26px; stroke: #fff; }
+  .cta-live .cl-t { font-weight: 800; font-size: 17px; }
+  .cta-live .cl-s { font-size: 12px; opacity: .88; margin-top: 2px; }
+
+  .onglets { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; background: rgba(255,255,255,0.96); backdrop-filter: blur(12px); border-top: 1px solid var(--border); display: flex; padding: 8px 10px calc(var(--sab) + 8px); max-width: 560px; margin: 0 auto; }
+  .onglet { flex: 1; border: none; background: none; font-family: inherit; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10.5px; font-weight: 600; color: var(--text3); padding: 6px 2px; border-radius: 12px; }
+  .onglet svg { width: 21px; height: 21px; }
+  .onglet.actif { color: var(--accent); }
+  .ecran { display: none; } .ecran.actif { display: block; }
+
+  .compteur { display: flex; justify-content: space-between; align-items: baseline; background: linear-gradient(135deg, var(--nuit), #232a5c); color: #fff; border-radius: 16px; padding: 15px 18px; margin-bottom: 16px; box-shadow: 0 6px 18px rgba(26,29,63,.2); }
+  .compteur .c-lots { font-size: 12px; color: #a9acd0; font-weight: 600; }
+  .compteur .c-total { font-family: 'Libre Franklin','Inter',sans-serif; font-size: 25px; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+  .voir-tableau { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; background: #fff; border: 1.5px solid var(--border); border-radius: 14px; padding: 13px; font-family: inherit; font-weight: 700; font-size: 14px; color: var(--text2); margin-bottom: 14px; }
+  .voir-tableau svg { width: 19px; height: 19px; }
+  .voir-tableau:active { background: #f6f6fc; }
+
+  .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--border); border-radius: 14px; background: #fff; max-height: 60vh; }
+  table.data { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.data th { background: #f3f4fb; color: var(--text2); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: .4px; padding: 10px 11px; text-align: left; white-space: nowrap; position: sticky; top: 0; }
+  table.data td { padding: 10px 11px; border-top: 1px solid var(--border); vertical-align: middle; }
+  table.data td.num { font-variant-numeric: tabular-nums; font-weight: 700; }
+  table.data td.mtt { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+  table.data tr:active { background: #f6f6fc; }
+  table.data img.mini { width: 44px; height: 44px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); display: block; }
+  .th-photo { width: 56px; }
+
+  .photo-zone { border: 1.5px dashed var(--border); border-radius: 14px; padding: 14px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; background: #fbfbfe; }
+  .photo-zone img { width: 100%; max-width: 220px; border-radius: 12px; border: 1px solid var(--border); }
+  .photo-zone .pz-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--accent); color: #fff; border: none; border-radius: 11px; padding: 11px 16px; font-weight: 700; font-size: 14px; font-family: inherit; }
+  .photo-zone .pz-btn.sec { background: #fff; color: var(--text2); border: 1.5px solid var(--border); }
+  .photo-zone .pz-row { display: flex; gap: 8px; }
+
+  .suggest { border: 1px solid var(--border); border-radius: 12px; background: #fff; margin-top: 6px; overflow: hidden; max-height: 190px; overflow-y: auto; }
+  .suggest-item { width: 100%; text-align: left; background: none; border: none; border-top: 1px solid var(--border); padding: 11px 13px; font-family: inherit; font-size: 14px; color: var(--text); display: flex; flex-direction: column; gap: 1px; }
+  .suggest-item:first-child { border-top: none; }
+  .suggest-item:active { background: #f0f2fb; }
+  .suggest-item .si-nom { font-weight: 700; }
+  .suggest-item .si-meta { font-size: 12px; color: var(--text3); }
+  .chip-sel { display: inline-flex; align-items: center; gap: 8px; background: var(--ok-light); color: #12703a; border: 1px solid #bfe6cd; border-radius: 10px; padding: 8px 12px; font-size: 13px; font-weight: 600; margin-top: 6px; }
+  .chip-sel button { background: none; border: none; color: #12703a; font-size: 16px; font-weight: 800; line-height: 1; }
+
+  .ach-item { width: 100%; background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 13px 14px; margin-bottom: 9px; display: flex; align-items: center; gap: 11px; font-family: inherit; text-align: left; color: inherit; }
+  .ach-item:active { background: #f6f6fc; }
+  .ach-item .l-num { background: var(--accent); color: #fff; border-radius: 8px; font-weight: 800; font-size: 13px; min-width: 30px; height: 28px; padding: 0 7px; display: inline-flex; align-items: center; justify-content: center; }
+  .ach-item .a-corps { flex: 1; min-width: 0; }
+  .ach-item .a-nom { font-weight: 700; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ach-item .a-meta { font-size: 12px; color: var(--text3); }
+  .badge { font-size: 10.5px; font-weight: 700; padding: 3px 8px; border-radius: 99px; flex-shrink: 0; }
+  .badge.ok { color: var(--ok); background: var(--ok-light); }
+  .badge.warn { color: var(--warn); background: var(--warn-light); }
+
+  .voile { position: fixed; inset: 0; background: rgba(20,22,50,0.45); z-index: 100; display: none; align-items: flex-end; justify-content: center; }
+  .voile.ouvert { display: flex; }
+  .feuille { background: var(--bg); width: 100%; max-width: 560px; border-radius: 22px 22px 0 0; padding: 8px 18px calc(var(--sab) + 18px); max-height: 90vh; overflow-y: auto; animation: monte .28s cubic-bezier(.3,1.1,.5,1); }
+  @keyframes monte { from { transform: translateY(60px); opacity: 0.4; } to { transform: none; opacity: 1; } }
+  .feuille .poignee { width: 42px; height: 5px; border-radius: 99px; background: #cfd2e4; margin: 6px auto 14px; }
+  .feuille h3 { font-size: 17px; font-weight: 800; margin-bottom: 16px; }
+  .feuille.large { max-width: 720px; }
+
+  .overlay-valid { position: fixed; inset: 0; z-index: 300; background: rgba(255,255,255,.86); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; flex-direction: column; gap: 22px; }
+  .overlay-valid.ouvert { display: flex; }
+  .ring { width: 96px; height: 96px; }
+  .ring circle.bg { stroke: #e2e6f2; }
+  .ring circle.fg { stroke: var(--ok); stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%; transition: stroke-dashoffset .9s cubic-bezier(.35,.9,.3,1); }
+  .ring-check { position: absolute; opacity: 0; transform: scale(.4); transition: all .3s ease .55s; }
+  .ring-check.vu { opacity: 1; transform: scale(1); }
+  .overlay-valid .ov-txt { font-weight: 700; color: var(--text2); font-size: 14px; }
+  .valid-choix { display: none; gap: 12px; width: 100%; max-width: 360px; padding: 0 24px; }
+  .valid-choix.vu { display: grid; grid-template-columns: 1fr 1fr; }
+
+  .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--sab) + 100px); background: var(--nuit); color: #fff; padding: 11px 18px; border-radius: 99px; font-size: 13.5px; font-weight: 600; z-index: 400; opacity: 0; transition: opacity .25s; pointer-events: none; max-width: 88%; text-align: center; }
+  .toast.vu { opacity: 1; }
+  .note { font-size: 12px; color: var(--text3); margin-top: 10px; line-height: 1.5; }
+  .recap-ligne { display: flex; justify-content: space-between; padding: 9px 2px; border-bottom: 1px solid var(--border); font-size: 14px; }
+  .recap-ligne:last-child { border-bottom: none; }
+  .recap-ligne .v { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .alerte { background: var(--warn-light); border: 1px solid #f0dcae; color: #7c5d17; border-radius: 12px; padding: 11px 13px; font-size: 13px; margin-bottom: 12px; }
+  .case-memo { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text); margin: 4px 0 16px; font-weight: 500; }
+  .case-memo input { width: 20px; height: 20px; accent-color: var(--accent); }
+  .btn-pv { background: linear-gradient(135deg, var(--accent2), #8a4ba6); box-shadow: 0 4px 16px rgba(110,58,134,.3); }
+  /* choix de nature (matériel / véhicules / autre) */
+  .nature-choix { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .nature-opt { border: 1.5px solid var(--border); background: #fff; color: var(--text2); font-family: inherit; font-weight: 700; font-size: 13.5px; padding: 11px 6px; border-radius: 12px; transition: all .15s; }
+  .nature-opt.actif { border-color: var(--accent); background: #eef1fb; color: var(--accent); }
+  /* onglets carnets (accueil) */
+  .carnets-onglets { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; margin-bottom: 18px; }
+  .carnet-onglet {
+    background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 14px 12px;
+    font-family: inherit; display: flex; flex-direction: column; align-items: center; gap: 9px;
+    color: var(--text); position: relative; transition: transform .1s; box-shadow: 0 2px 8px rgba(26,29,63,.06);
+  }
+  .carnet-onglet:active { transform: scale(.97); }
+  .carnet-onglet .co-ic { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; }
+  .carnet-onglet .co-ic svg { width: 21px; height: 21px; stroke: #fff; }
+  .carnet-onglet .co-t { font-weight: 700; font-size: 12.5px; text-align: center; line-height: 1.35; color: var(--text2); }
+  .carnet-onglet .co-n { position: absolute; top: 9px; right: 11px; background: var(--bg); color: var(--text3); font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 99px; }
+  /* puces de variables (fiche mandataire) */
+  .vars-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 8px; }
+  .var-chip { border: 1px dashed var(--accent); background: #f0f3fd; color: var(--accent); font-family: inherit; font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 99px; }
+  .var-chip:active { background: #e2e8fb; }
+
+  /* ── Saisie live en 2 étapes ── */
+  .live-tete { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .etapes-points { display: flex; align-items: center; gap: 6px; }
+  .ep { width: 10px; height: 10px; border-radius: 50%; background: #d5d8ea; transition: all .3s; }
+  .ep.actif { background: var(--accent); transform: scale(1.25); box-shadow: 0 0 0 4px rgba(48,64,144,.15); }
+  .ep.fait { background: var(--ok); }
+  .ep-trait { width: 22px; height: 2px; background: #d5d8ea; border-radius: 2px; }
+  .etape-live { animation: etapeIn .3s cubic-bezier(.3,.9,.4,1); }
+  @keyframes etapeIn { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: none; } }
+  .etape-titre { display: flex; align-items: center; gap: 9px; font-weight: 800; font-size: 15px; margin-bottom: 12px; color: var(--text); }
+  .etape-titre .et-num { width: 26px; height: 26px; border-radius: 50%; background: linear-gradient(135deg, var(--etude-b1), var(--etude-b2)); color: #fff; font-size: 13px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
+  /* flèche blanche dans un rond bleu */
+  .fleche-etape {
+    display: flex; align-items: center; justify-content: center;
+    width: 60px; height: 60px; border-radius: 50%; border: none; margin: 4px auto 0;
+    background: linear-gradient(135deg, var(--accent), #4a63c8);
+    box-shadow: 0 6px 18px rgba(48,64,144,.4); transition: transform .12s;
+    animation: flechePulse 2.2s ease-in-out infinite;
+  }
+  .fleche-etape svg { width: 26px; height: 26px; }
+  .fleche-etape:active { transform: scale(.92); }
+  @keyframes flechePulse { 0%,100% { box-shadow: 0 6px 18px rgba(48,64,144,.4); } 50% { box-shadow: 0 6px 26px rgba(48,64,144,.65); } }
+  /* récap lot en étape 2 */
+  .live-recap { display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #eef1fb, #f4effa); border: 1px solid #dfe3f4; border-radius: 12px; padding: 11px 14px; margin-bottom: 12px; font-size: 13.5px; }
+  .live-recap:empty { display: none; }
+  .live-recap .lr-lot { font-weight: 700; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: 10px; }
+  .live-recap .lr-mtt { font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .btn-valider-adj { box-shadow: 0 4px 16px rgba(22,163,74,.35); position: relative; overflow: hidden; }
+  .btn-valider-adj::after { content: ""; position: absolute; top: 0; left: -60%; width: 40%; height: 100%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.3), transparent); transform: skewX(-18deg); animation: reflet 3.4s ease-in-out infinite; }
+
+  /* particules de succès (validation) */
+  .confettis { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .confetti { position: absolute; width: 8px; height: 8px; border-radius: 2px; opacity: 0; animation: confFly 1s ease-out forwards; }
+  @keyframes confFly {
+    0% { opacity: 1; transform: translate(0,0) rotate(0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--cx), var(--cy)) rotate(var(--cr)) scale(.5); }
+  }
+
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } #splash { display: none !important; } }
+
+  #splash { position: fixed; inset: 0; z-index: 999; background: var(--noir); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px; transition: opacity .5s ease; padding: 0 30px; }
+  #splash .s-logo { width: min(240px, 60vw); animation: sLogo .8s ease-out; filter: brightness(0) invert(1); opacity: .96; }
+  #splash .s-brand { display: inline-flex; align-items: center; gap: 10px; animation: sLogo .8s ease-out .12s backwards; }
+  #splash .s-brand .sa { font-weight: 800; letter-spacing: 7px; font-variant: small-caps; font-size: 26px; background: linear-gradient(120deg, #6f8cf0, #b57ad6 55%, #6f8cf0); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: shimmer 3s linear infinite; }
+  @keyframes shimmer { to { background-position: 200% center; } }
+  #splash .s-brand .sm { font-weight: 700; letter-spacing: 2px; font-size: 10px; text-transform: uppercase; color: #fff; background: linear-gradient(135deg, var(--etude-b1), var(--etude-b2)); padding: 3px 8px; border-radius: 7px; }
+  #splash .s-barre { position: relative; width: min(240px, 74vw); height: 8px; border-radius: 99px; background: rgba(255,255,255,.09); overflow: hidden; }
+  #splash .s-remplie { position: relative; height: 100%; width: 0; border-radius: 99px; background: linear-gradient(90deg, var(--ocean1), var(--ocean2)); background-size: 200% 100%; animation: sBarre 3.1s cubic-bezier(.45,.15,.35,1) forwards, vague 1.4s linear infinite; }
+  #splash .s-remplie::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,.45), transparent); background-size: 60% 100%; background-repeat: no-repeat; animation: vagueGlint 1.6s ease-in-out infinite; }
+  @keyframes sBarre { from { width: 0; } to { width: 100%; } }
+  @keyframes vague { to { background-position: -200% 0; } }
+  @keyframes vagueGlint { 0% { background-position: -60% 0; } 100% { background-position: 160% 0; } }
+  #splash .s-etat { font-size: 12.5px; color: #8a8fbf; font-weight: 600; letter-spacing: .3px; min-height: 16px; animation: sLogo .8s ease-out .2s backwards; }
+  @keyframes sLogo { from { opacity: 0; transform: translateY(12px) scale(.97); } to { opacity: 1; transform: none; } }
+
+  /* ════ ÉCRAN D'ACCÈS (verrou) ════ */
+  .verrou-ecran {
+    min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 20px;
+    padding: calc(var(--sat) + 30px) 26px calc(var(--sab) + 30px);
+    background: radial-gradient(120% 90% at 50% 0%, #23264d 0%, var(--noir) 62%);
+  }
+  .verrou-logo { width: min(190px, 52vw); filter: brightness(0) invert(1); opacity: .95; animation: vFade .7s ease-out; }
+  .verrou-brand { display: inline-flex; align-items: center; gap: 9px; animation: vFade .7s ease-out .1s backwards; }
+  .verrou-brand .va { font-weight: 800; letter-spacing: 5px; font-variant: small-caps; font-size: 22px; background: linear-gradient(120deg, #6f8cf0, #b57ad6 55%, #6f8cf0); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .verrou-brand .vm { font-weight: 700; letter-spacing: 1.5px; font-size: 9px; text-transform: uppercase; color: #fff; background: linear-gradient(135deg, var(--etude-b1), var(--etude-b2)); padding: 2px 7px; border-radius: 6px; }
+  .verrou-carte {
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px; padding: 26px 22px; width: 100%; max-width: 340px; text-align: center;
+    backdrop-filter: blur(10px); animation: vRise .6s cubic-bezier(.3,1,.5,1) .15s backwards;
+  }
+  .verrou-ic { font-size: 32px; margin-bottom: 10px; }
+  .verrou-t { font-weight: 800; font-size: 18px; color: #fff; margin-bottom: 6px; }
+  .verrou-s { font-size: 13px; color: #a9acd0; margin-bottom: 18px; line-height: 1.5; }
+  .verrou-input { max-width: 210px; margin: 0 auto 14px; letter-spacing: 8px; text-align: center; font-size: 20px; font-weight: 700; }
+  .verrou-note { font-size: 12px; color: #6b6f98; animation: vFade 1s ease-out .3s backwards; }
+  @keyframes vFade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes vRise { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+  .verrou-carte.secoue { animation: secoue .45s ease; }
+  @keyframes secoue { 0%,100%{transform:none} 20%{transform:translateX(-9px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(4px)} }
+
+  /* ════ ÉCRAN BIENVENUE TACTILE (toucher pour entrer) ════ */
+  .bvt {
+    position: relative; min-height: 100vh; min-height: 100dvh; overflow: hidden;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+    padding: calc(var(--sat) + 30px) 26px calc(var(--sab) + 30px);
+    background: radial-gradient(120% 90% at 50% 8%, #262a58 0%, var(--noir) 64%);
+    cursor: pointer; transition: opacity .38s ease, transform .38s ease;
+  }
+  .bvt.sortie { opacity: 0; transform: scale(1.04); }
+  .bvt-halo {
+    position: absolute; top: 12%; left: 50%; width: 340px; height: 340px; transform: translateX(-50%);
+    background: radial-gradient(circle, rgba(110,88,214,.22), transparent 65%);
+    animation: haloPulse 4.5s ease-in-out infinite; pointer-events: none;
+  }
+  @keyframes haloPulse { 0%,100% { opacity: .6; transform: translateX(-50%) scale(1); } 50% { opacity: 1; transform: translateX(-50%) scale(1.12); } }
+  .bvt-logo { width: min(210px, 56vw); filter: brightness(0) invert(1); opacity: .96; animation: vFade .9s ease-out; position: relative; }
+  .bvt-brand { display: inline-flex; align-items: center; gap: 9px; animation: vFade .9s ease-out .1s backwards; }
+  .bvt-brand .va { font-weight: 800; letter-spacing: 5px; font-variant: small-caps; font-size: 22px; background: linear-gradient(120deg, #6f8cf0, #b57ad6 55%, #6f8cf0); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: shimmer 3.2s linear infinite; }
+  .bvt-brand .vm { font-weight: 700; letter-spacing: 1.5px; font-size: 9px; text-transform: uppercase; color: #fff; background: linear-gradient(135deg, var(--etude-b1), var(--etude-b2)); padding: 2px 7px; border-radius: 6px; }
+  .bvt-titre { font-size: 30px; font-weight: 300; letter-spacing: .5px; color: #fff; margin-top: 8px; animation: vRise .8s cubic-bezier(.2,.9,.3,1) .25s backwards; }
+  .bvt-touch {
+    position: absolute; bottom: calc(var(--sab) + 54px); left: 0; right: 0;
+    display: flex; flex-direction: column; align-items: center; gap: 14px;
+    font-size: 13.5px; font-weight: 600; color: #9a9ec9; letter-spacing: .4px;
+    animation: touchPulse 2.4s ease-in-out infinite;
+  }
+  @keyframes touchPulse { 0%,100% { opacity: .55; } 50% { opacity: 1; } }
+  .bvt-cercle {
+    width: 44px; height: 44px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,.35); position: relative;
+  }
+  .bvt-cercle::after {
+    content: ""; position: absolute; inset: -2px; border-radius: 50%;
+    border: 2px solid rgba(140,150,255,.5); animation: onde 2.4s ease-out infinite;
+  }
+  @keyframes onde { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.9); opacity: 0; } }
+
+  /* ════ ANIMATION DE BIENVENUE façon Apple ════ */
+  .bienvenue {
+    position: fixed; inset: 0; z-index: 800; display: none;
+    align-items: center; justify-content: center;
+    background: radial-gradient(130% 100% at 50% 40%, #23264d 0%, #0a0b1e 68%);
+  }
+  .bienvenue.ouvert { display: flex; }
+  .bienvenue.sortie { animation: bvSortie .6s ease forwards; }
+  @keyframes bvSortie { to { opacity: 0; transform: scale(1.06); } }
+  .bv-inner { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .bv-logo {
+    width: min(170px, 46vw); filter: brightness(0) invert(1);
+    opacity: 0; transform: scale(.82); animation: bvLogo 1s cubic-bezier(.2,.9,.3,1.1) forwards;
+  }
+  @keyframes bvLogo { to { opacity: .97; transform: scale(1); } }
+  .bv-txt {
+    font-size: 27px; font-weight: 300; letter-spacing: .5px; color: #fff;
+    opacity: 0; transform: translateY(10px); font-family: -apple-system, 'Inter', sans-serif;
+  }
+  .bv-sous {
+    font-size: 13px; color: #9498c8; font-weight: 500; letter-spacing: 2px; text-transform: uppercase;
+    opacity: 0; transform: translateY(8px);
+  }
+  .bienvenue.phase2 .bv-txt { animation: bvUp .7s cubic-bezier(.2,.9,.3,1) forwards; }
+  .bienvenue.phase2 .bv-sous { animation: bvUp .7s cubic-bezier(.2,.9,.3,1) .12s forwards; }
+  @keyframes bvUp { to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <img class="s-logo" src="logo-etude.png" alt="Étude Copi &amp; Kesser">
+  <div class="s-brand"><span class="sa">Auctio</span><span class="sm">Mobile</span></div>
+  <div class="s-barre"><div class="s-remplie"></div></div>
+  <div class="s-etat" id="splash-etat">Initialisation…</div>
+</div>
+<script>
+  (function () {
+    var etats = ['Initialisation\u2026', 'Chargement de l\u2019\u00e9tude\u2026', 'Pr\u00e9paration des ventes\u2026', 'S\u00e9curisation des donn\u00e9es\u2026', 'Pr\u00eat.'];
+    var el = document.getElementById('splash-etat'); var i = 0;
+    var t = setInterval(function () { i++; if (el && etats[i]) el.textContent = etats[i]; if (i >= etats.length - 1) clearInterval(t); }, 640);
+    setTimeout(function () { var s = document.getElementById('splash'); if (s) { s.style.opacity = '0'; setTimeout(function () { s.remove(); }, 520); } }, 3150);
+  })();
+</script>
+
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+
+<!-- Animation de bienvenue façon Apple (après validation du code) -->
+<div class="bienvenue" id="bienvenue">
+  <div class="bv-inner">
+    <img class="bv-logo" src="logo-etude.png" alt="">
+    <div class="bv-txt">Bienvenue</div>
+    <div class="bv-sous">Étude Copi &amp; Kesser</div>
+  </div>
+</div>
+
+<div class="overlay-valid" id="overlay-valid">
+  <div style="position:relative;display:flex;align-items:center;justify-content:center;">
+    <svg class="ring" viewBox="0 0 100 100">
+      <circle class="bg" cx="50" cy="50" r="42" fill="none" stroke-width="7"/>
+      <circle class="fg" id="ring-fg" cx="50" cy="50" r="42" fill="none" stroke-width="7" stroke-dasharray="263.9" stroke-dashoffset="263.9"/>
+    </svg>
+    <svg class="ring-check" id="ring-check" width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  </div>
+  <div class="ov-txt" id="ov-txt">Enregistrement…</div>
+  <div class="valid-choix" id="valid-choix">
+    <button class="btn ghost" onclick="validFin('quitter')">Quitter</button>
+    <button class="btn vert" onclick="validFin('nouveau')">Nouvel enregistrement</button>
+  </div>
+</div>
+
+<script src="xlsx.min.js"></script>
+<script src="exceljs.min.js"></script>
+<script>
+'use strict';
+// ════════════════════════════════════════════════════════════════════
+//  AUCTIO MOBILE — saisie live des ventes aux enchères
+//  100 % hors-ligne : les données vivent dans ce téléphone.
+//  Texte  → localStorage (léger, robuste)
+//  Photos → IndexedDB (séparé, ne peut pas saturer les données de vente)
+// ════════════════════════════════════════════════════════════════════
+
+const CLE = 'auctio_mobile_v2';
+// etat.carnet = carnet GLOBAL d'adjudicataires (partagé entre toutes les ventes)
+// etat.mandataires = carnet GLOBAL des mandataires judiciaires
+let etat = { ventes: [], code: null, carnet: [], mandataires: [], memoCode: false };
+let venteId = null;
+let ongletActif = 'bord';
+let deverrouille = false;
+
+// ─── Persistance texte ───
+function charger() {
+  try { const s = localStorage.getItem(CLE); if (s) etat = JSON.parse(s); } catch (e) {}
+  if (!etat || typeof etat !== 'object') etat = {};
+  if (!Array.isArray(etat.ventes)) etat.ventes = [];
+  if (!Array.isArray(etat.carnet)) etat.carnet = [];
+  if (!Array.isArray(etat.mandataires)) etat.mandataires = [];
+  if (typeof etat.code === 'undefined') etat.code = null;
+  if (typeof etat.memoCode === 'undefined') etat.memoCode = false;
+}
+function sauver() {
+  try { localStorage.setItem(CLE, JSON.stringify(etat)); }
+  catch (e) { toast('Mémoire pleine — exportez vos ventes.'); }
+}
+function vente() { return etat.ventes.find(v => v.id === venteId); }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+function esc(s) { const d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
+function eur(n) { return (Number(n) || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'; }
+function dateFR(iso) { if (!iso) return ''; const [y, m, d] = iso.split('-'); return `${d}/${m}/${y}`; }
+let _toastT = null;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('vu');
+  clearTimeout(_toastT); _toastT = setTimeout(() => t.classList.remove('vu'), 2600);
+}
+
+// ─── IndexedDB : stockage des photos (clé = idPhoto, valeur = dataURL JPEG compressé) ───
+let _db = null;
+function db() {
+  return new Promise((resolve, reject) => {
+    if (_db) return resolve(_db);
+    const rq = indexedDB.open('auctio_photos', 1);
+    rq.onupgradeneeded = () => { rq.result.createObjectStore('photos'); };
+    rq.onsuccess = () => { _db = rq.result; resolve(_db); };
+    rq.onerror = () => reject(rq.error);
+  });
+}
+async function photoSet(id, dataURL) {
+  try { const d = await db(); return await new Promise((res, rej) => { const tx = d.transaction('photos', 'readwrite'); tx.objectStore('photos').put(dataURL, id); tx.oncomplete = res; tx.onerror = () => rej(tx.error); }); }
+  catch (e) { toast('Photo non enregistrée (stockage indisponible).'); }
+}
+async function photoGet(id) {
+  try { const d = await db(); return await new Promise((res) => { const tx = d.transaction('photos', 'readonly'); const rq = tx.objectStore('photos').get(id); rq.onsuccess = () => res(rq.result || null); rq.onerror = () => res(null); }); }
+  catch (e) { return null; }
+}
+async function photoDel(id) {
+  try { const d = await db(); const tx = d.transaction('photos', 'readwrite'); tx.objectStore('photos').delete(id); } catch (e) {}
+}
+
+// ─── Compression d'une photo prise (canvas → JPEG ~0.7, max 1100px) ───
+function compresserPhoto(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const MAX = 1100;
+      let { width: w, height: h } = img;
+      if (w > MAX || h > MAX) { const r = Math.min(MAX / w, MAX / h); w = Math.round(w * r); h = Math.round(h * r); }
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      c.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(c.toDataURL('image/jpeg', 0.7));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('image illisible')); };
+    img.src = url;
+  });
+}
+
+// ─── Icônes ───
+const IC = {
+  marteau: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4l6 6M12 6l6 6M12 6L4 14l6 6 8-8M4 20h7"/></svg>',
+  gens: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>',
+  doc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+  grille: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
+  bord: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>',
+  cam: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>',
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+  live: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M5 5a10 10 0 000 14M19 5a10 10 0 010 14M2 12h.01M22 12h.01"/></svg>',
+  oeil: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',
+  partage: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="17" height="17"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>',
+};
+
+// ════════════════════════════════════════════════════════════════════
+//  ROUTAGE DES ÉCRANS
+//  Flux d'entrée : splash → écran Bienvenue (toucher) → code → animation → app
+// ════════════════════════════════════════════════════════════════════
+let phaseEntree = 'bienvenue';   // 'bienvenue' → 'verrou' → app
+function render() {
+  const app = document.getElementById('app');
+  // Le tableau de bord n'est JAMAIS accessible avant le passage par l'écran
+  // d'accès — même si aucun code n'est encore programmé.
+  if (!deverrouille) {
+    if (phaseEntree === 'bienvenue') { app.innerHTML = ecranBienvenueTactile(); return; }
+    app.innerHTML = ecranVerrou();
+    setTimeout(() => { const e = document.getElementById('v-code'); if (e) e.focus(); }, 250);
+    return;
+  }
+  if (!venteId) { app.innerHTML = ecranAccueil(); return; }
+  app.innerHTML = ecranVente();
+  majCompteur();
+}
+
+// ─── Écran Bienvenue tactile (façon écran de veille) ───
+function ecranBienvenueTactile() {
+  return `
+  <div class="bvt" onclick="toucherPourEntrer()">
+    <div class="bvt-halo"></div>
+    <img class="bvt-logo" src="logo-etude.png" alt="Étude Copi & Kesser">
+    <div class="bvt-brand"><span class="va">Auctio</span><span class="vm">Mobile</span></div>
+    <div class="bvt-titre">Bienvenue</div>
+    <div class="bvt-touch">
+      <span class="bvt-cercle"></span>
+      Touchez l'écran pour entrer
+    </div>
+  </div>`;
+}
+function toucherPourEntrer() {
+  // transition douce vers l'écran d'accès (ou déverrouillage direct si code mémorisé)
+  const el = document.querySelector('.bvt');
+  if (el) el.classList.add('sortie');
+  setTimeout(() => {
+    if (etat.code && etat.memoCode) { animationBienvenue(); }
+    else { phaseEntree = 'verrou'; render(); }
+  }, 380);
+}
+
+// ─── Écran d'accès (code) ───
+function ecranVerrou() {
+  const aCode = !!etat.code;
+  return `
+  <div class="verrou-ecran">
+    <img class="verrou-logo" src="logo-etude.png" alt="Étude Copi & Kesser">
+    <div class="verrou-brand"><span class="va">Auctio</span><span class="vm">Mobile</span></div>
+    <div class="verrou-carte">
+      ${aCode ? `
+        <div class="verrou-ic">🔒</div>
+        <div class="verrou-t">Application verrouillée</div>
+        <div class="verrou-s">Saisissez le code d'accès de l'étude.</div>
+        <input class="champ verrou-input" id="v-code" inputmode="numeric" type="password" autocomplete="off" onkeydown="if(event.key==='Enter')deverrouiller()">
+        <button class="btn" onclick="deverrouiller()">Déverrouiller</button>
+      ` : `
+        <div class="verrou-ic">🔑</div>
+        <div class="verrou-t">Accès à l'application</div>
+        <div class="verrou-s">Aucun code n'est encore défini. Vous pouvez en créer un pour protéger l'accès, ou entrer directement.</div>
+        <button class="btn" onclick="entrerSansCode()">Entrer dans l'application</button>
+        <button class="btn ghost petit" style="margin-top:10px;" onclick="deverrouille=true;render();ouvrirCode();">Définir un code d'accès</button>
+      `}
+    </div>
+    <div class="verrou-note">Vos données restent dans ce téléphone.</div>
+  </div>`;
+}
+function deverrouiller() {
+  const saisi = document.getElementById('v-code').value.trim();
+  if (saisi === etat.code) { animationBienvenue(); }
+  else {
+    toast('Code incorrect.');
+    const carte = document.querySelector('.verrou-carte');
+    if (carte) { carte.classList.remove('secoue'); void carte.offsetWidth; carte.classList.add('secoue'); }
+    const e = document.getElementById('v-code'); if (e) { e.value = ''; e.focus(); }
+  }
+}
+function entrerSansCode() { animationBienvenue(); }
+
+// ─── Animation de bienvenue façon Apple (après validation du code) ───
+function animationBienvenue() {
+  deverrouille = true;
+  const ov = document.getElementById('bienvenue');
+  if (!ov) { render(); return; }
+  ov.classList.add('ouvert');
+  // enchaînement : logo qui apparaît → "Bienvenue" → fondu → accueil
+  setTimeout(() => ov.classList.add('phase2'), 900);
+  setTimeout(() => { ov.classList.add('sortie'); }, 2300);
+  setTimeout(() => { ov.classList.remove('ouvert', 'phase2', 'sortie'); render(); }, 2950);
+}
+
+// ─── Accueil : liste des ventes ───
+function ecranAccueil() {
+  const liste = etat.ventes.slice().reverse().map(v => {
+    const nb = v.adjudications.filter(a => !a.invendu).length;
+    const tot = v.adjudications.reduce((s, a) => s + (a.invendu ? 0 : a.montant), 0);
+    return `
+    <button class="vente-item" onclick="ouvrirVente('${v.id}')">
+      <span class="ic">${esc((v.nom || '?').charAt(0).toUpperCase())}</span>
+      <span style="flex:1;min-width:0;">
+        <span class="vi-nom">${esc(v.nom)}${v.cloture ? '<span class="tag-cloture">clôturée</span>' : ''}</span>
+        <div class="vi-meta">${dateFR(v.date)}${v.lieu ? ' · ' + esc(v.lieu) : ''} · ${nb} lot(s) · ${eur(tot)}</div>
+      </span>
+      <span class="vi-fleche">›</span>
+    </button>`;
+  }).join('');
+
+  return `
+  <div class="topbar">
+    <img class="logo-mini" src="logo-etude.png" alt="">
+    <div class="titre"><span class="brand"><span class="a">Auctio</span><span class="m">Mobile</span></span></div>
+    <button class="back" onclick="ouvrirCode()" title="Code d'accès" style="font-size:15px;">${etat.code ? '🔒' : '🔓'}</button>
+  </div>
+  <div class="contenu">
+    ${etat.code ? '' : `
+      <div class="alerte" style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+        <span>Aucun code d'accès : l'app s'ouvre sans protection.</span>
+        <button class="btn petit" style="width:auto;padding:8px 14px;background:var(--warn);" onclick="ouvrirCode()">Définir</button>
+      </div>`}
+
+    <button class="cta-live" onclick="ouvrirNouvelleVente()">
+      <span class="cl-ic">${IC.live}</span>
+      <span style="flex:1;">
+        <div class="cl-t">Nouvelle vente live</div>
+        <div class="cl-s">Commissaire, société liquidée, mandataire…</div>
+      </span>
+      <span style="font-size:22px;opacity:.75;">›</span>
+    </button>
+
+    <div class="carnets-onglets">
+      <button class="carnet-onglet" onclick="ouvrirCarnet()">
+        <span class="co-ic" style="background:linear-gradient(135deg,#b4892a,#d1a83f);">${IC.gens}</span>
+        <span class="co-t">Carnet général<br>des adjudicataires</span>
+        <span class="co-n">${etat.carnet.length}</span>
+      </button>
+      <button class="carnet-onglet" onclick="ouvrirMandataires()">
+        <span class="co-ic" style="background:linear-gradient(135deg,var(--etude-b1),var(--etude-b2));">${IC.doc}</span>
+        <span class="co-t">Carnet général<br>des mandataires</span>
+        <span class="co-n">${etat.mandataires.length}</span>
+      </button>
+    </div>
+
+    ${etat.ventes.length ? liste : `
+      <div class="vide">
+        <strong>Aucune vente pour l'instant</strong>
+        Créez une vente live avant de partir sur les lieux :<br>ses informations rempliront le PV automatiquement.
+      </div>`}
+    <div class="note" style="text-align:center;">Les données restent dans ce téléphone.<br>Pensez à envoyer le PV dès la fin de la vente.</div>
+  </div>
+
+  ${modaleCodeHTML()}
+  ${modaleVenteHTML()}
+  ${modaleCarnetHTML()}
+  ${modaleMandatairesHTML()}`;
+}
+
+// ─── Modale : code d'accès (avec case de mémorisation) ───
+function modaleCodeHTML() {
+  return `
+  <div class="voile" id="m-code">
+    <div class="feuille">
+      <div class="poignee"></div>
+      <h3>Code d'accès</h3>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">
+        Le code protège l'accès à l'application. Les données, elles, ne quittent jamais ce téléphone.
+      </p>
+      ${etat.code ? `
+      <div class="fgroupe"><label>Code actuel</label><input class="champ gros" id="c-actuel" inputmode="numeric" type="password" style="letter-spacing:6px;"></div>` : ''}
+      <div class="fgroupe"><label>Nouveau code (4 chiffres ou plus)</label><input class="champ gros" id="c-nouveau" inputmode="numeric" type="password" style="letter-spacing:6px;"></div>
+      <div class="fgroupe"><label>Confirmer le nouveau code</label><input class="champ gros" id="c-confirme" inputmode="numeric" type="password" style="letter-spacing:6px;"></div>
+      <label class="case-memo"><input type="checkbox" id="c-memo" ${etat.memoCode ? 'checked' : ''}> Mémoriser le code sur ce téléphone (déverrouillage automatique)</label>
+      <button class="btn" onclick="validerCode()">${etat.code ? 'Changer le code' : 'Activer le code'}</button>
+      ${etat.code ? `<button class="btn danger-ghost petit" style="margin-top:10px;" onclick="retirerCode()">Retirer le code</button>` : ''}
+      <button class="btn ghost petit" style="margin-top:10px;" onclick="fermer('m-code')">Annuler</button>
+    </div>
+  </div>`;
+}
+function ouvrirCode() {
+  document.getElementById('m-code').classList.add('ouvert');
+  setTimeout(() => { const e = document.getElementById(etat.code ? 'c-actuel' : 'c-nouveau'); if (e) e.focus(); }, 250);
+}
+function validerCode() {
+  if (etat.code) {
+    const actuel = (document.getElementById('c-actuel').value || '').trim();
+    if (actuel !== etat.code) { toast('Code actuel incorrect.'); return; }
+  }
+  const nouveau = (document.getElementById('c-nouveau').value || '').trim();
+  const confirme = (document.getElementById('c-confirme').value || '').trim();
+  if (nouveau.length < 4) { toast('Le code doit faire au moins 4 chiffres.'); return; }
+  if (nouveau !== confirme) { toast('Les deux codes ne correspondent pas.'); return; }
+  etat.code = nouveau;
+  etat.memoCode = document.getElementById('c-memo').checked;
+  deverrouille = true;
+  sauver(); render();
+  toast('Code d\'accès activé.');
+}
+function retirerCode() {
+  const actuel = (document.getElementById('c-actuel').value || '').trim();
+  if (actuel !== etat.code) { toast('Saisissez le code actuel pour le retirer.'); return; }
+  if (!confirm('Retirer le code d\'accès ? L\'app s\'ouvrira sans protection.')) return;
+  etat.code = null; etat.memoCode = false;
+  sauver(); render();
+  toast('Code retiré.');
+}
+
+// ─── Modale : nouvelle vente (pré-live) ───
+function modaleVenteHTML() {
+  return `
+  <div class="voile" id="m-vente">
+    <div class="feuille">
+      <div class="poignee"></div>
+      <h3>Nouvelle vente live</h3>
+
+      <div class="fgroupe"><label>Commissaire de justice</label>
+        <select class="champ" id="nv-comm">
+          <option value="Me Marine KESSER">Me Marine KESSER</option>
+          <option value="Me Jean-Luc COPI">Me Jean-Luc COPI</option>
+        </select>
+      </div>
+
+      <div class="card" style="padding:14px;margin-bottom:14px;">
+        <div class="card-titre">Société liquidée</div>
+        <div class="fgroupe"><label>Nom de la société *</label><input class="champ" id="nv-nom" placeholder="ex. SAS METZGER"></div>
+        <div class="fgroupe"><label>Siège social — adresse postale</label><input class="champ" id="nv-soc-adresse" placeholder="ex. 9 rue d'Illzach"></div>
+        <div class="grille2" style="margin-bottom:0;">
+          <div><label>Code postal</label><input class="champ" id="nv-soc-cp" inputmode="numeric" placeholder="68100"></div>
+          <div><label>Ville</label><input class="champ" id="nv-soc-ville" autocapitalize="characters" placeholder="MULHOUSE"></div>
+        </div>
+      </div>
+
+      <div class="card" style="padding:14px;margin-bottom:14px;">
+        <div class="card-titre">À la requête de</div>
+        <div class="fgroupe" style="margin-bottom:0;"><label>Mandataire judiciaire</label>
+          <input class="champ" id="nv-mandataire" placeholder="ex. SELARL MJ EST" oninput="rechercheMandataireVente()" autocomplete="off">
+          <div id="nv-mand-suggest"></div>
+          <div class="note" style="margin-top:6px;">Sélectionnez un mandataire du carnet (texte du PV automatique) ou saisissez librement.</div>
+        </div>
+      </div>
+
+      <div class="card" style="padding:14px;margin-bottom:14px;">
+        <div class="card-titre">La vente</div>
+        <div class="grille2 fgroupe">
+          <div><label>Date de la vente *</label><input class="champ" id="nv-date" type="date"></div>
+          <div><label>Heure</label><input class="champ" id="nv-heure" type="time"></div>
+        </div>
+        <div class="fgroupe"><label>Adresse exacte de la vente</label><input class="champ" id="nv-lieu" placeholder="ex. 9 rue d'Illzach à 68100 MULHOUSE"></div>
+        <div class="fgroupe"><label>Nature de la vente</label>
+          <div class="nature-choix" id="nv-nature-choix">
+            <button type="button" class="nature-opt actif" data-val="matériel" onclick="choisirNature(this)">Matériel</button>
+            <button type="button" class="nature-opt" data-val="véhicules" onclick="choisirNature(this)">Véhicules</button>
+            <button type="button" class="nature-opt" data-val="autre" onclick="choisirNature(this)">Autre</button>
+          </div>
+          <input class="champ" id="nv-nature-autre" placeholder="Précisez la nature de la vente" style="display:none;margin-top:8px;">
+        </div>
+        <div class="fgroupe" style="margin-bottom:0;"><label>Publication dans le journal L'Alsace le</label><input class="champ" id="nv-publication" type="date"></div>
+      </div>
+
+      <button class="btn violet" onclick="creerVente()">Créer la vente</button>
+      <button class="btn ghost petit" style="margin-top:10px;" onclick="fermer('m-vente')">Annuler</button>
+    </div>
+  </div>`;
+}
+let _venteMandataireId = null;
+function rechercheMandataireVente() {
+  _venteMandataireId = null;
+  const q = document.getElementById('nv-mandataire').value.trim().toLowerCase();
+  const wrap = document.getElementById('nv-mand-suggest');
+  if (q.length < 2) { wrap.innerHTML = ''; return; }
+  const res = etat.mandataires.filter(m => (m.nom + ' ' + (m.adresse || '')).toLowerCase().includes(q)).slice(0, 5);
+  if (!res.length) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = '<div class="suggest">' + res.map(m => `
+    <button type="button" class="suggest-item" onclick="choisirMandataireVente('${m.id}')">
+      <span class="si-nom">${esc(m.nom)}</span>
+      <span class="si-meta">${esc(m.adresse || '')}</span>
+    </button>`).join('') + '</div>';
+}
+function choisirMandataireVente(id) {
+  const m = etat.mandataires.find(x => x.id === id); if (!m) return;
+  _venteMandataireId = id;
+  document.getElementById('nv-mandataire').value = m.nom;
+  document.getElementById('nv-mand-suggest').innerHTML = '';
+}
+function choisirNature(btn) {
+  document.querySelectorAll('#nv-nature-choix .nature-opt').forEach(b => b.classList.remove('actif'));
+  btn.classList.add('actif');
+  document.getElementById('nv-nature-autre').style.display = btn.dataset.val === 'autre' ? 'block' : 'none';
+}
+function ouvrirNouvelleVente() {
+  _venteMandataireId = null;
+  document.getElementById('m-vente').classList.add('ouvert');
+  setTimeout(() => { const d = document.getElementById('nv-date'); if (d && !d.value) d.value = new Date().toISOString().slice(0, 10); const e = document.getElementById('nv-nom'); if (e) e.focus(); }, 250);
+}
+function fermer(id) { const e = document.getElementById(id); if (e) e.classList.remove('ouvert'); }
+function creerVente() {
+  const nom = document.getElementById('nv-nom').value.trim();
+  const date = document.getElementById('nv-date').value;
+  if (!nom || !date) { toast('Nom de la société et date sont obligatoires.'); return; }
+  const natureBtn = document.querySelector('#nv-nature-choix .nature-opt.actif');
+  let nature = natureBtn ? natureBtn.dataset.val : 'matériel';
+  if (nature === 'autre') {
+    const libre = document.getElementById('nv-nature-autre').value.trim();
+    nature = libre || 'autre';
+  }
+  const v = {
+    id: uid(), nom, date,
+    heure: document.getElementById('nv-heure').value,
+    lieu: document.getElementById('nv-lieu').value.trim(),
+    nature,
+    commissaire: document.getElementById('nv-comm').value,
+    societe: {
+      adresse: document.getElementById('nv-soc-adresse').value.trim(),
+      cp: document.getElementById('nv-soc-cp').value.trim(),
+      ville: document.getElementById('nv-soc-ville').value.trim(),
+    },
+    mandataireId: _venteMandataireId,
+    mandataireNom: document.getElementById('nv-mandataire').value.trim(),
+    datePublication: document.getElementById('nv-publication').value,
+    adjudications: [],   // { id, lot, designation, adjNum, adjId, montant, invendu }
+    acheteurs: {},       // adjNum -> { nom, adresse, cp, ville, mode, regle, carnetId }
+    lots: [],            // { id, num, libelle, photoId } — catalogue photo propre à la vente
+    cloture: false, creeLe: new Date().toISOString(),
+  };
+  etat.ventes.push(v); sauver();
+  venteId = v.id; ongletActif = 'bord';
+  render();
+  toast('Vente créée — bonne vente !');
+}
+function ouvrirVente(id) { venteId = id; ongletActif = 'bord'; render(); }
+function retourAccueil() { venteId = null; render(); }
+
+// ════════════════════════════════════════════════════════════════════
+//  CARNET GLOBAL DES ADJUDICATAIRES (partagé entre toutes les ventes)
+// ════════════════════════════════════════════════════════════════════
+function carnetLabel(c) {
+  const nomComplet = [c.nom, c.prenom].filter(Boolean).join(' ');
+  return nomComplet || '(sans nom)';
+}
+function carnetMeta(c) {
+  return [c.adresse, [c.cp, c.ville].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+}
+function trouverCarnet(id) { return etat.carnet.find(c => c.id === id); }
+// Ajoute au carnet ou met à jour si (nom+prenom) déjà présent ; renvoie l'id carnet.
+function upsertCarnet(fiche) {
+  const clef = (fiche.nom + '¤' + (fiche.prenom || '')).toLowerCase().trim();
+  let c = etat.carnet.find(x => (x.nom + '¤' + (x.prenom || '')).toLowerCase().trim() === clef && clef !== '¤');
+  if (c) {
+    // complète les champs vides sans écraser l'existant
+    ['prenom', 'adresse', 'cp', 'ville', 'mail', 'tel'].forEach(k => { if (fiche[k] && !c[k]) c[k] = fiche[k]; });
+  } else {
+    c = { id: uid(), nom: fiche.nom || '', prenom: fiche.prenom || '', adresse: fiche.adresse || '', cp: fiche.cp || '', ville: fiche.ville || '', mail: fiche.mail || '', tel: fiche.tel || '', creeLe: new Date().toISOString() };
+    etat.carnet.push(c);
+  }
+  return c.id;
+}
+
+function modaleCarnetHTML() {
+  const liste = etat.carnet.slice().sort((a, b) => carnetLabel(a).localeCompare(carnetLabel(b))).map(c => `
+    <button class="ach-item" onclick="ouvrirFicheCarnet('${c.id}')">
+      <span class="l-num" style="background:var(--accent2);">${esc((c.nom || '?').charAt(0).toUpperCase())}</span>
+      <span class="a-corps">
+        <div class="a-nom">${esc(carnetLabel(c))}</div>
+        <div class="a-meta">${esc(carnetMeta(c) || '—')}${c.tel ? ' · ' + esc(c.tel) : ''}</div>
+      </span>
+      <span class="vi-fleche">›</span>
+    </button>`).join('');
+  return `
+  <div class="voile" id="m-carnet">
+    <div class="feuille">
+      <div class="poignee"></div>
+      <h3>Carnet des adjudicataires</h3>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">Répertoire général, commun à toutes les ventes. Tout nouvel adjudicataire y est ajouté automatiquement.</p>
+      <button class="btn petit" style="margin-bottom:14px;background:var(--accent2);" onclick="ouvrirFicheCarnet('')">+ Ajouter un adjudicataire</button>
+      <div id="carnet-liste">
+        ${etat.carnet.length ? liste : '<div class="vide">Aucun adjudicataire enregistré pour l\'instant.</div>'}
+      </div>
+      <button class="btn ghost petit" style="margin-top:8px;" onclick="exporterCarnet()">${IC.partage} Exporter le carnet (.xlsx)</button>
+      <button class="btn ghost petit" style="margin-top:10px;" onclick="fermer('m-carnet')">Fermer</button>
+    </div>
+  </div>
+  ${modaleFicheCarnetHTML()}`;
+}
+function ouvrirCarnet() { document.getElementById('m-carnet').classList.add('ouvert'); }
+
+// ─── Fiche d'un adjudicataire du carnet ───
+let _ficheCarnetId = null;
+function modaleFicheCarnetHTML() {
+  return `
+  <div class="voile" id="m-fiche-carnet">
+    <div class="feuille">
+      <div class="poignee"></div>
+      <h3 id="fc-titre">Adjudicataire</h3>
+      <div class="grille2 fgroupe">
+        <div><label>Nom *</label><input class="champ" id="fc-nom" autocapitalize="characters" placeholder="POYER"></div>
+        <div><label>Prénom</label><input class="champ" id="fc-prenom" autocapitalize="words" placeholder="Fabrice"></div>
+      </div>
+      <div class="fgroupe"><label>Adresse (n° et rue)</label><input class="champ" id="fc-adresse" placeholder="14 Chemin du Saucy"></div>
+      <div class="grille2 fgroupe">
+        <div><label>Code postal</label><input class="champ" id="fc-cp" inputmode="numeric" placeholder="68100"></div>
+        <div><label>Ville</label><input class="champ" id="fc-ville" autocapitalize="characters" placeholder="MULHOUSE"></div>
+      </div>
+      <div class="grille2 fgroupe">
+        <div><label>E-mail (facultatif)</label><input class="champ" id="fc-mail" inputmode="email" placeholder="—"></div>
+        <div><label>Téléphone (facultatif)</label><input class="champ" id="fc-tel" inputmode="tel" placeholder="—"></div>
+      </div>
+      <button class="btn" onclick="validerFicheCarnet()">Enregistrer</button>
+      <div class="btn-duo" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;" id="fc-actions"></div>
+    </div>
+  </div>`;
+}
+function ouvrirFicheCarnet(id) {
+  _ficheCarnetId = id || null;
+  const c = id ? trouverCarnet(id) : null;
+  document.getElementById('fc-titre').textContent = c ? 'Modifier l\'adjudicataire' : 'Nouvel adjudicataire';
+  ['nom', 'prenom', 'adresse', 'cp', 'ville', 'mail', 'tel'].forEach(k => { document.getElementById('fc-' + k).value = c ? (c[k] || '') : ''; });
+  document.getElementById('fc-actions').innerHTML = c
+    ? `<button class="btn danger-ghost petit" onclick="supprimerFicheCarnet()">Supprimer</button><button class="btn ghost petit" onclick="fermer('m-fiche-carnet')">Annuler</button>`
+    : `<button class="btn ghost petit" style="grid-column:1/3;" onclick="fermer('m-fiche-carnet')">Annuler</button>`;
+  document.getElementById('m-fiche-carnet').classList.add('ouvert');
+  setTimeout(() => document.getElementById('fc-nom').focus(), 250);
+}
+function validerFicheCarnet() {
+  const nom = document.getElementById('fc-nom').value.trim();
+  if (!nom) { toast('Le nom est obligatoire.'); return; }
+  const fiche = {}; ['nom', 'prenom', 'adresse', 'cp', 'ville', 'mail', 'tel'].forEach(k => fiche[k] = document.getElementById('fc-' + k).value.trim());
+  if (_ficheCarnetId) {
+    const c = trouverCarnet(_ficheCarnetId);
+    Object.assign(c, fiche);
+  } else {
+    upsertCarnet(fiche);
+  }
+  sauver();
+  fermer('m-fiche-carnet');
+  // rafraîchit la liste du carnet si ouverte
+  const wrap = document.getElementById('carnet-liste');
+  if (wrap) { fermer('m-carnet'); if (!venteId) render(); setTimeout(ouvrirCarnet, 60); }
+  toast('Adjudicataire enregistré.');
+}
+function supprimerFicheCarnet() {
+  if (!confirm('Retirer cet adjudicataire du carnet général ?')) return;
+  etat.carnet = etat.carnet.filter(c => c.id !== _ficheCarnetId);
+  sauver(); fermer('m-fiche-carnet'); fermer('m-carnet');
+  if (!venteId) render();
+  setTimeout(ouvrirCarnet, 60);
+  toast('Adjudicataire supprimé.');
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  CARNET GLOBAL DES MANDATAIRES JUDICIAIRES
+//  Chaque mandataire : nom, adresse du siège, texte-type pour le PV écrit
+//  avec variables {nom de la société liquidée} et {siège social de la société liquidée}
+// ════════════════════════════════════════════════════════════════════
+const TEXTE_MANDATAIRE_DEFAUT = "{nom du mandataire} – Mandataires judiciaires – ayant son siège social {adresse du mandataire}, pris en sa qualité de liquidateur judiciaire de la {nom de la société liquidée}, ayant son siège social {siège social de la société liquidée},";
+
+function modaleMandatairesHTML() {
+  const liste = etat.mandataires.slice().sort((a, b) => (a.nom || '').localeCompare(b.nom || '')).map(m => `
+    <button class="ach-item" onclick="ouvrirFicheMandataire('${m.id}')">
+      <span class="l-num" style="background:linear-gradient(135deg,var(--etude-b1),var(--etude-b2));">${esc((m.nom || '?').charAt(0).toUpperCase())}</span>
+      <span class="a-corps">
+        <div class="a-nom">${esc(m.nom)}</div>
+        <div class="a-meta">${esc(m.adresse || 'adresse à compléter')}</div>
+      </span>
+      <span class="vi-fleche">›</span>
+    </button>`).join('');
+  return `
+  <div class="voile" id="m-mandataires">
+    <div class="feuille">
+      <div class="poignee"></div>
+      <h3>Carnet des mandataires judiciaires</h3>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">Répertoire commun à toutes les ventes. Le texte-type de chaque mandataire remplit automatiquement le procès-verbal écrit.</p>
+      <button class="btn petit" style="margin-bottom:14px;background:linear-gradient(135deg,var(--etude-b1),var(--etude-b2));" onclick="ouvrirFicheMandataire('')">+ Ajouter un mandataire</button>
+      <div id="mandataires-liste">
+        ${etat.mandataires.length ? liste : '<div class="vide">Aucun mandataire enregistré pour l\'instant.</div>'}
+      </div>
+      <button class="btn ghost petit" style="margin-top:10px;" onclick="fermer('m-mandataires')">Fermer</button>
+    </div>
+  </div>
+  ${modaleFicheMandataireHTML()}`;
+}
+function ouvrirMandataires() { document.getElementById('m-mandataires').classList.add('ouvert'); }
+
+let _ficheMandataireId = null;
+function modaleFicheMandataireHTML() {
+  return `
+  <div class="voile" id="m-fiche-mandataire">
+    <div class="feuille">
+      <div class="poignee"></div>
+      <h3 id="fm-titre">Mandataire judiciaire</h3>
+      <div class="fgroupe"><label>Nom du mandataire *</label><input class="champ" id="fm-nom" placeholder="ex. SELARL MJ EST"></div>
+      <div class="fgroupe"><label>Adresse du siège social</label><input class="champ" id="fm-adresse" placeholder="ex. 36 rue Paul Cézanne, 68200 MULHOUSE"></div>
+      <div class="fgroupe">
+        <label>Texte pour le PV de vente</label>
+        <textarea class="champ" id="fm-texte" rows="6" style="resize:vertical;line-height:1.5;font-size:14px;"></textarea>
+        <div class="note">Variables disponibles — touchez pour insérer :</div>
+        <div class="vars-chips">
+          <button type="button" class="var-chip" onclick="insererVariableMand('{nom de la société liquidée}')">{nom de la société liquidée}</button>
+          <button type="button" class="var-chip" onclick="insererVariableMand('{siège social de la société liquidée}')">{siège social de la société liquidée}</button>
+          <button type="button" class="var-chip" onclick="insererVariableMand('{nom du mandataire}')">{nom du mandataire}</button>
+          <button type="button" class="var-chip" onclick="insererVariableMand('{adresse du mandataire}')">{adresse du mandataire}</button>
+        </div>
+      </div>
+      <button class="btn" onclick="validerFicheMandataire()">Enregistrer</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;" id="fm-actions"></div>
+    </div>
+  </div>`;
+}
+function insererVariableMand(variable) {
+  const ta = document.getElementById('fm-texte');
+  const debut = ta.selectionStart || ta.value.length;
+  ta.value = ta.value.slice(0, debut) + variable + ta.value.slice(ta.selectionEnd || debut);
+  ta.focus();
+  const pos = debut + variable.length;
+  ta.setSelectionRange(pos, pos);
+}
+function ouvrirFicheMandataire(id) {
+  _ficheMandataireId = id || null;
+  const m = id ? etat.mandataires.find(x => x.id === id) : null;
+  document.getElementById('fm-titre').textContent = m ? 'Modifier le mandataire' : 'Nouveau mandataire judiciaire';
+  document.getElementById('fm-nom').value = m ? (m.nom || '') : '';
+  document.getElementById('fm-adresse').value = m ? (m.adresse || '') : '';
+  document.getElementById('fm-texte').value = m ? (m.textePV || '') : TEXTE_MANDATAIRE_DEFAUT;
+  document.getElementById('fm-actions').innerHTML = m
+    ? `<button class="btn danger-ghost petit" onclick="supprimerFicheMandataire()">Supprimer</button><button class="btn ghost petit" onclick="fermer('m-fiche-mandataire')">Annuler</button>`
+    : `<button class="btn ghost petit" style="grid-column:1/3;" onclick="fermer('m-fiche-mandataire')">Annuler</button>`;
+  document.getElementById('m-fiche-mandataire').classList.add('ouvert');
+  setTimeout(() => document.getElementById('fm-nom').focus(), 250);
+}
+function validerFicheMandataire() {
+  const nom = document.getElementById('fm-nom').value.trim();
+  if (!nom) { toast('Le nom du mandataire est obligatoire.'); return; }
+  const fiche = {
+    nom,
+    adresse: document.getElementById('fm-adresse').value.trim(),
+    textePV: document.getElementById('fm-texte').value.trim(),
+  };
+  if (_ficheMandataireId) {
+    Object.assign(etat.mandataires.find(x => x.id === _ficheMandataireId), fiche);
+  } else {
+    etat.mandataires.push(Object.assign({ id: uid(), creeLe: new Date().toISOString() }, fiche));
+  }
+  sauver();
+  fermer('m-fiche-mandataire'); fermer('m-mandataires');
+  if (!venteId) render();
+  setTimeout(ouvrirMandataires, 60);
+  toast('Mandataire enregistré.');
+}
+function supprimerFicheMandataire() {
+  if (!confirm('Retirer ce mandataire du carnet ?')) return;
+  etat.mandataires = etat.mandataires.filter(m => m.id !== _ficheMandataireId);
+  sauver(); fermer('m-fiche-mandataire'); fermer('m-mandataires');
+  if (!venteId) render();
+  setTimeout(ouvrirMandataires, 60);
+  toast('Mandataire supprimé.');
+}
+// Résout le texte "à la requête de" d'une vente (mandataire du carnet ou saisie libre)
+function texteRequete(v) {
+  const m = v.mandataireId ? etat.mandataires.find(x => x.id === v.mandataireId) : null;
+  const siegeSociete = v.societe ? [v.societe.adresse, [v.societe.cp, v.societe.ville].filter(Boolean).join(' ')].filter(Boolean).join(' à ') : '';
+  if (m && m.textePV) {
+    return m.textePV
+      .replace(/\{nom du mandataire\}/g, m.nom || '')
+      .replace(/\{adresse du mandataire\}/g, m.adresse || '')
+      .replace(/\{nom de la société liquidée\}/g, v.nom || '')
+      .replace(/\{siège social de la société liquidée\}/g, siegeSociete || '');
+  }
+  // saisie libre ou mandataire sans texte : formule par défaut
+  const nomMand = (m && m.nom) || v.mandataireNom || '';
+  const adrMand = (m && m.adresse) ? ', ayant son siège social ' + m.adresse : '';
+  let t = nomMand + adrMand + ', pris en sa qualité de liquidateur judiciaire de la ' + (v.nom || '');
+  if (siegeSociete) t += ', ayant son siège social ' + siegeSociete;
+  return t + ',';
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  ÉCRAN D'UNE VENTE — tableau de bord + onglets
+// ════════════════════════════════════════════════════════════════════
+function ecranVente() {
+  const v = vente();
+  return `
+  <div class="topbar">
+    <button class="back" onclick="retourAccueil()">‹</button>
+    <div style="flex:1;min-width:0;">
+      <div class="titre">${esc(v.nom)}</div>
+      <div class="sous">${dateFR(v.date)}${v.lieu ? ' · ' + esc(v.lieu) : ''} · ${esc(v.commissaire)}</div>
+    </div>
+  </div>
+  <div class="contenu">
+    <div class="ecran ${ongletActif === 'bord' ? 'actif' : ''}" id="ecran-bord">${ecranBord(v)}</div>
+    <div class="ecran ${ongletActif === 'live' ? 'actif' : ''}" id="ecran-live">${ecranLiveListe(v)}</div>
+    <div class="ecran ${ongletActif === 'cloture' ? 'actif' : ''}" id="ecran-cloture">${ecranCloture(v)}</div>
+  </div>
+  <nav class="onglets">
+    <button class="onglet ${ongletActif === 'bord' ? 'actif' : ''}" onclick="allerOnglet('bord')">${IC.bord}Tableau de bord</button>
+    <button class="onglet ${ongletActif === 'live' ? 'actif' : ''}" onclick="allerOnglet('live')">${IC.marteau}Enregistrements</button>
+    <button class="onglet ${ongletActif === 'cloture' ? 'actif' : ''}" onclick="allerOnglet('cloture')">${IC.doc}Clôture &amp; PV</button>
+  </nav>
+  ${modaleLotHTML()}
+  ${modaleAdjHTML()}
+  ${modaleLiveHTML()}
+  ${modaleTableauHTML()}`;
+}
+function allerOnglet(o) { ongletActif = o; render(); }
+
+// ─── Tableau de bord : compteur + 3 actions + œil ───
+function ecranBord(v) {
+  return `
+  <div class="compteur">
+    <span class="c-lots" id="c-lots"></span>
+    <span class="c-total" id="c-total"></span>
+  </div>
+  ${v.cloture ? '<div class="alerte">Vente clôturée — les enregistrements sont verrouillés. Rouvrez-la depuis l\'onglet Clôture si besoin.</div>' : ''}
+  <div class="actions-dash">
+    <button class="action-btn b-lot" onclick="ouvrirLot('')">
+      <span class="ab-ic">${IC.cam}</span>
+      <span><div class="ab-t">Enregistrer un nouveau lot</div><div class="ab-s">Libellé + photo · fiche des lots</div></span>
+      <span class="ab-fleche">›</span>
+    </button>
+    <button class="action-btn b-adj" onclick="ouvrirAdj('')">
+      <span class="ab-ic">${IC.gens}</span>
+      <span><div class="ab-t">Nouvel adjudicataire</div><div class="ab-s">Nom, adresse · carnet général</div></span>
+      <span class="ab-fleche">›</span>
+    </button>
+    <button class="action-btn b-live" onclick="ouvrirLive()">
+      <span class="ab-ic">${IC.live}</span>
+      <span><div class="ab-t">Débuter la vente live</div><div class="ab-s">Adjudicataire · lot · montant</div></span>
+      <span class="ab-fleche">›</span>
+    </button>
+  </div>
+  <button class="voir-tableau" onclick="ouvrirTableau('live')">${IC.oeil} Voir les enregistrements de la vente</button>
+  <button class="voir-tableau" onclick="ouvrirTableau('lots')">${IC.grille} Voir la fiche des lots (${v.lots.length})</button>`;
+}
+function majCompteur() {
+  const v = vente(); if (!v) return;
+  const el1 = document.getElementById('c-lots'), el2 = document.getElementById('c-total');
+  if (!el1) return;
+  const vendus = v.adjudications.filter(a => !a.invendu);
+  const tot = vendus.reduce((s, a) => s + a.montant, 0);
+  el1.textContent = `${vendus.length} lot(s) adjugé(s)`;
+  el2.textContent = eur(tot);
+}
+function lireMontant(s) { s = String(s || '').replace(/\s/g, '').replace(',', '.'); const n = parseFloat(s); return isNaN(n) ? 0 : n; }
+
+// ════════════════════════════════════════════════════════════════════
+//  1) ENREGISTRER UN NOUVEAU LOT (libellé + photo optionnelle)
+// ════════════════════════════════════════════════════════════════════
+let _lotId = null;
+let _lotPhotoData = null;   // dataURL en attente d'enregistrement
+let _lotPhotoSuppr = false;
+function modaleLotHTML() {
+  return `
+  <div class="voile" id="m-lot">
+    <div class="feuille">
+      <div class="poignee"></div>
+      <h3 id="lot-titre">Nouveau lot</h3>
+      <div class="grille2 fgroupe">
+        <div><label>N° de lot *</label><input class="champ gros" id="lot-num" inputmode="numeric" autocomplete="off"></div>
+        <div style="display:flex;align-items:flex-end;"><div class="note" style="margin:0;">Le n° suivant se pré-remplit tout seul.</div></div>
+      </div>
+      <div class="fgroupe"><label>Libellé du lot *</label><input class="champ" id="lot-lib" placeholder="ex. Une découpeuse tronçonneuse" autocomplete="off"></div>
+      <div class="fgroupe">
+        <label>Photo (facultative)</label>
+        <div class="photo-zone" id="lot-photo-zone"></div>
+        <input type="file" id="lot-photo-input" accept="image/*" capture="environment" style="display:none;" onchange="onPhotoChoisie(event)">
+      </div>
+      <button class="btn" onclick="validerLot()">Enregistrer le lot</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;" id="lot-actions"></div>
+    </div>
+  </div>`;
+}
+function dessinerPhotoZone() {
+  const z = document.getElementById('lot-photo-zone');
+  if (!z) return;
+  const aUnePhoto = _lotPhotoData && !_lotPhotoSuppr;
+  if (aUnePhoto) {
+    z.innerHTML = `<img src="${_lotPhotoData}" alt="">
+      <div class="pz-row">
+        <button class="pz-btn" onclick="document.getElementById('lot-photo-input').click()">${IC.cam} Reprendre</button>
+        <button class="pz-btn sec" onclick="retirerPhotoLot()">Retirer</button>
+      </div>`;
+  } else {
+    z.innerHTML = `<div style="color:var(--text3);font-size:13px;">Aucune photo</div>
+      <button class="pz-btn" onclick="document.getElementById('lot-photo-input').click()">${IC.cam} Prendre / choisir une photo</button>`;
+  }
+}
+async function onPhotoChoisie(ev) {
+  const f = ev.target.files && ev.target.files[0];
+  ev.target.value = '';
+  if (!f) return;
+  toast('Compression de la photo…');
+  try { _lotPhotoData = await compresserPhoto(f); _lotPhotoSuppr = false; dessinerPhotoZone(); }
+  catch (e) { toast('Photo illisible.'); }
+}
+function retirerPhotoLot() { _lotPhotoData = null; _lotPhotoSuppr = true; dessinerPhotoZone(); }
+
+async function ouvrirLot(id) {
+  const v = vente();
+  _lotId = id || null; _lotPhotoData = null; _lotPhotoSuppr = false;
+  const lot = id ? v.lots.find(l => l.id === id) : null;
+  document.getElementById('lot-titre').textContent = lot ? 'Modifier le lot' : 'Nouveau lot';
+  document.getElementById('lot-lib').value = lot ? lot.libelle : '';
+  // n° pré-rempli : suivant du plus grand n° existant
+  let numPre = '';
+  if (lot) numPre = lot.num;
+  else { const nums = v.lots.map(l => parseInt(l.num, 10)).filter(n => !isNaN(n)); numPre = nums.length ? String(Math.max(...nums) + 1) : '1'; }
+  document.getElementById('lot-num').value = numPre;
+  document.getElementById('lot-actions').innerHTML = lot
+    ? `<button class="btn danger-ghost petit" onclick="supprimerLot()">Supprimer</button><button class="btn ghost petit" onclick="fermer('m-lot')">Annuler</button>`
+    : `<button class="btn ghost petit" style="grid-column:1/3;" onclick="fermer('m-lot')">Annuler</button>`;
+  document.getElementById('m-lot').classList.add('ouvert');
+  // charge la photo existante
+  if (lot && lot.photoId) { _lotPhotoData = await photoGet(lot.photoId); }
+  dessinerPhotoZone();
+}
+async function validerLot() {
+  const v = vente();
+  const num = document.getElementById('lot-num').value.trim();
+  const lib = document.getElementById('lot-lib').value.trim();
+  if (!num) { toast('Indiquez le n° de lot.'); return; }
+  if (!lib) { toast('Indiquez le libellé du lot.'); return; }
+
+  let lot = _lotId ? v.lots.find(l => l.id === _lotId) : null;
+  if (!lot) { lot = { id: uid(), num, libelle: lib, photoId: null }; v.lots.push(lot); }
+  else { lot.num = num; lot.libelle = lib; }
+
+  // gestion photo
+  if (_lotPhotoSuppr && lot.photoId) { await photoDel(lot.photoId); lot.photoId = null; }
+  if (_lotPhotoData && !_lotPhotoSuppr) {
+    if (!lot.photoId) lot.photoId = 'ph_' + uid();
+    await photoSet(lot.photoId, _lotPhotoData);
+  }
+  sauver();
+  fermer('m-lot');
+  // rester sur le tableau de bord et rafraîchir le compteur de lots
+  if (ongletActif === 'bord') render();
+  // si le tableau des lots est ouvert, le rafraîchir
+  rafraichirTableauSiOuvert();
+  toast('Lot enregistré.');
+}
+async function supprimerLot() {
+  const v = vente();
+  if (!confirm('Supprimer ce lot de la fiche ?')) return;
+  const lot = v.lots.find(l => l.id === _lotId);
+  if (lot && lot.photoId) await photoDel(lot.photoId);
+  v.lots = v.lots.filter(l => l.id !== _lotId);
+  sauver(); fermer('m-lot');
+  if (ongletActif === 'bord') render();
+  rafraichirTableauSiOuvert();
+  toast('Lot supprimé.');
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  2) NOUVEL ADJUDICATAIRE (alimente le carnet général)
+// ════════════════════════════════════════════════════════════════════
+function modaleAdjHTML() {
+  return `
+  <div class="voile" id="m-adj">
+    <div class="feuille">
+      <div class="poignee"></div>
+      <h3>Nouvel adjudicataire</h3>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">Enregistré dans le carnet général, commun à toutes les ventes.</p>
+      <div class="grille2 fgroupe">
+        <div><label>Nom *</label><input class="champ" id="adj-nom" autocapitalize="characters" placeholder="POYER"></div>
+        <div><label>Prénom</label><input class="champ" id="adj-prenom" autocapitalize="words" placeholder="Fabrice"></div>
+      </div>
+      <div class="fgroupe"><label>Adresse (n° et rue)</label><input class="champ" id="adj-adresse" placeholder="14 Chemin du Saucy"></div>
+      <div class="grille2 fgroupe">
+        <div><label>Code postal</label><input class="champ" id="adj-cp" inputmode="numeric" placeholder="68100"></div>
+        <div><label>Ville</label><input class="champ" id="adj-ville" autocapitalize="characters" placeholder="MULHOUSE"></div>
+      </div>
+      <div class="grille2 fgroupe">
+        <div><label>E-mail (facultatif)</label><input class="champ" id="adj-mail" inputmode="email" placeholder="—"></div>
+        <div><label>Téléphone (facultatif)</label><input class="champ" id="adj-tel" inputmode="tel" placeholder="—"></div>
+      </div>
+      <button class="btn" style="background:var(--accent2);" onclick="validerAdj()">Enregistrer l'adjudicataire</button>
+      <button class="btn ghost petit" style="margin-top:10px;" onclick="fermer('m-adj')">Annuler</button>
+    </div>
+  </div>`;
+}
+function ouvrirAdj() {
+  ['nom', 'prenom', 'adresse', 'cp', 'ville', 'mail', 'tel'].forEach(k => { const e = document.getElementById('adj-' + k); if (e) e.value = ''; });
+  document.getElementById('m-adj').classList.add('ouvert');
+  setTimeout(() => document.getElementById('adj-nom').focus(), 250);
+}
+function validerAdj() {
+  const nom = document.getElementById('adj-nom').value.trim();
+  if (!nom) { toast('Le nom est obligatoire.'); return; }
+  const fiche = {}; ['nom', 'prenom', 'adresse', 'cp', 'ville', 'mail', 'tel'].forEach(k => fiche[k] = document.getElementById('adj-' + k).value.trim());
+  upsertCarnet(fiche); sauver();
+  fermer('m-adj');
+  toast('Adjudicataire ajouté au carnet.');
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  3) DÉBUTER LA VENTE LIVE — saisie repensée
+//     adjudicataire (sélection rapide → n° auto) · lot (sélection rapide) · montant
+// ════════════════════════════════════════════════════════════════════
+let _liveCarnetId = null;   // adjudicataire choisi dans le carnet (ou null si saisie libre)
+let _liveLotId = null;      // lot choisi dans le catalogue (ou null)
+function modaleLiveHTML() {
+  return `
+  <div class="voile" id="m-live">
+    <div class="feuille">
+      <div class="poignee"></div>
+      <div class="live-tete">
+        <h3 style="margin:0;">Vente live</h3>
+        <div class="etapes-points">
+          <span class="ep" id="ep-1"></span>
+          <span class="ep-trait"></span>
+          <span class="ep" id="ep-2"></span>
+        </div>
+      </div>
+
+      <!-- ── ÉTAPE 1 : LOT & MONTANT ── -->
+      <div class="etape-live" id="etape-1">
+        <div class="etape-titre"><span class="et-num">1</span> Lot &amp; montant</div>
+        <div class="card" style="margin-bottom:14px;padding:14px;">
+          <div class="fgroupe"><label>Lot (n° ou libellé) *</label><input class="champ" id="lv-lot" placeholder="ex. 63  ou  découpeuse" oninput="rechercheLotLive()"></div>
+          <div id="lv-lot-suggest"></div>
+          <div class="fgroupe" style="margin:8px 0 0;"><label>Montant (€) *</label><input class="champ gros" id="lv-mtt" inputmode="decimal" placeholder="0,00" enterkeyhint="next"></div>
+        </div>
+        <button class="fleche-etape" onclick="allerEtape(2)" title="Étape suivante">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+        <button class="btn ghost petit" style="margin-top:14px;" onclick="fermer('m-live')">Annuler</button>
+      </div>
+
+      <!-- ── ÉTAPE 2 : ADJUDICATAIRE ── -->
+      <div class="etape-live" id="etape-2" style="display:none;">
+        <div class="etape-titre"><span class="et-num">2</span> Adjudicataire</div>
+        <div class="live-recap" id="live-recap"></div>
+        <div class="card" style="margin-bottom:14px;padding:14px;">
+          <div class="grille2 fgroupe" style="margin-bottom:8px;">
+            <div><label>Nom *</label><input class="champ" id="lv-nom" autocapitalize="characters" placeholder="POYER" oninput="rechercheAdjLive()"></div>
+            <div><label>Prénom</label><input class="champ" id="lv-prenom" autocapitalize="words" placeholder="Fabrice" oninput="rechercheAdjLive()"></div>
+          </div>
+          <div id="lv-suggest"></div>
+          <div class="fgroupe" style="margin:8px 0 0;"><label>Adresse</label><input class="champ" id="lv-adresse" placeholder="14 Chemin du Saucy"></div>
+          <div class="grille2 fgroupe" style="margin-bottom:0;">
+            <div><label>Code postal</label><input class="champ" id="lv-cp" inputmode="numeric" placeholder="68100"></div>
+            <div><label>Ville</label><input class="champ" id="lv-ville" autocapitalize="characters" placeholder="MULHOUSE"></div>
+          </div>
+          <div class="note" id="lv-numinfo"></div>
+        </div>
+        <button class="btn vert btn-valider-adj" onclick="validerLive()">Valider l'adjudication ✓</button>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+          <button class="btn ghost petit" onclick="allerEtape(1)">‹ Retour au lot</button>
+          <button class="btn ghost petit" onclick="fermer('m-live')">Annuler</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+// Navigation entre les 2 étapes de la saisie live
+function allerEtape(n) {
+  if (n === 2) {
+    // valider l'étape 1 avant de passer
+    const lotSaisi = document.getElementById('lv-lot').value.trim();
+    const mtt = lireMontant(document.getElementById('lv-mtt').value);
+    if (!lotSaisi) { toast('Indiquez le lot.'); document.getElementById('lv-lot').focus(); return; }
+    if (!(mtt > 0)) { toast('Indiquez le montant.'); document.getElementById('lv-mtt').focus(); return; }
+    // récap affiché en étape 2
+    const recap = document.getElementById('live-recap');
+    if (recap) recap.innerHTML = `<span class="lr-lot">${esc(lotSaisi)}</span><span class="lr-mtt">${eur(mtt)}</span>`;
+  }
+  document.getElementById('etape-1').style.display = n === 1 ? 'block' : 'none';
+  document.getElementById('etape-2').style.display = n === 2 ? 'block' : 'none';
+  document.getElementById('ep-1').classList.toggle('actif', n === 1);
+  document.getElementById('ep-1').classList.toggle('fait', n === 2);
+  document.getElementById('ep-2').classList.toggle('actif', n === 2);
+  setTimeout(() => { const e = document.getElementById(n === 1 ? 'lv-lot' : 'lv-nom'); if (e) e.focus(); }, 200);
+}
+
+function ouvrirLive() {
+  const v = vente();
+  if (v.cloture) { toast('Vente clôturée — rouvrez-la pour saisir.'); return; }
+  resetLive();
+  document.getElementById('m-live').classList.add('ouvert');
+  allerEtape(1);
+  majNumInfoLive();
+}
+function resetLive() {
+  _liveCarnetId = null; _liveLotId = null;
+  ['nom', 'prenom', 'adresse', 'cp', 'ville', 'lot', 'mtt'].forEach(k => { const e = document.getElementById('lv-' + k); if (e) e.value = ''; });
+  const s = document.getElementById('lv-suggest'); if (s) s.innerHTML = '';
+  const s2 = document.getElementById('lv-lot-suggest'); if (s2) s2.innerHTML = '';
+  const r = document.getElementById('live-recap'); if (r) r.innerHTML = '';
+}
+// n° d'adjudicataire qui sera attribué : prochain n° chronologique de CETTE vente
+function prochainNumAdj(v) {
+  const nums = Object.keys(v.acheteurs).map(n => parseInt(n, 10)).filter(n => !isNaN(n));
+  return nums.length ? Math.max(...nums) + 1 : 1;
+}
+// si l'adjudicataire (carnet) a déjà un n° dans cette vente, on le réutilise
+function numAdjExistant(v, carnetId) {
+  if (!carnetId) return null;
+  for (const [num, f] of Object.entries(v.acheteurs)) { if (f.carnetId === carnetId) return parseInt(num, 10); }
+  return null;
+}
+function majNumInfoLive() {
+  const v = vente(); const info = document.getElementById('lv-numinfo'); if (!info) return;
+  const dejala = numAdjExistant(v, _liveCarnetId);
+  if (dejala) info.innerHTML = `Cet adjudicataire porte déjà le <strong>n° ${dejala}</strong> sur cette vente — il sera réutilisé.`;
+  else info.innerHTML = `N° d'adjudicataire attribué automatiquement : <strong>n° ${prochainNumAdj(v)}</strong>.`;
+}
+
+// Sélection rapide adjudicataire (recherche dans le carnet global)
+function rechercheAdjLive() {
+  _liveCarnetId = null; majNumInfoLive();
+  const q = (document.getElementById('lv-nom').value + ' ' + document.getElementById('lv-prenom').value).trim().toLowerCase();
+  const wrap = document.getElementById('lv-suggest');
+  if (q.length < 2) { wrap.innerHTML = ''; return; }
+  const res = etat.carnet.filter(c => (carnetLabel(c) + ' ' + carnetMeta(c)).toLowerCase().includes(q)).slice(0, 6);
+  if (!res.length) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = '<div class="suggest">' + res.map(c => `
+    <button class="suggest-item" onclick="choisirAdjLive('${c.id}')">
+      <span class="si-nom">${esc(carnetLabel(c))}</span>
+      <span class="si-meta">${esc(carnetMeta(c) || 'adresse à compléter')}</span>
+    </button>`).join('') + '</div>';
+}
+function choisirAdjLive(id) {
+  const c = trouverCarnet(id); if (!c) return;
+  _liveCarnetId = id;
+  document.getElementById('lv-nom').value = c.nom || '';
+  document.getElementById('lv-prenom').value = c.prenom || '';
+  document.getElementById('lv-adresse').value = c.adresse || '';
+  document.getElementById('lv-cp').value = c.cp || '';
+  document.getElementById('lv-ville').value = c.ville || '';
+  document.getElementById('lv-suggest').innerHTML = '';
+  majNumInfoLive();
+  document.getElementById('lv-lot').focus();
+}
+
+// Sélection rapide lot (dans le catalogue de la vente)
+function rechercheLotLive() {
+  _liveLotId = null;
+  const v = vente();
+  const q = document.getElementById('lv-lot').value.trim().toLowerCase();
+  const wrap = document.getElementById('lv-lot-suggest');
+  if (q.length < 1) { wrap.innerHTML = ''; return; }
+  const res = v.lots.filter(l => String(l.num).toLowerCase().includes(q) || (l.libelle || '').toLowerCase().includes(q)).slice(0, 6);
+  if (!res.length) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = '<div class="suggest">' + res.map(l => `
+    <button class="suggest-item" onclick="choisirLotLive('${l.id}')">
+      <span class="si-nom">Lot ${esc(l.num)}</span>
+      <span class="si-meta">${esc(l.libelle || '')}</span>
+    </button>`).join('') + '</div>';
+}
+function choisirLotLive(id) {
+  const v = vente(); const l = v.lots.find(x => x.id === id); if (!l) return;
+  _liveLotId = id;
+  document.getElementById('lv-lot').value = l.num + ' — ' + (l.libelle || '');
+  document.getElementById('lv-lot-suggest').innerHTML = '';
+  document.getElementById('lv-mtt').focus();
+}
+
+// ─── Validation d'une adjudication live + animation ───
+function validerLive() {
+  const v = vente();
+  const nom = document.getElementById('lv-nom').value.trim();
+  const prenom = document.getElementById('lv-prenom').value.trim();
+  const adresse = document.getElementById('lv-adresse').value.trim();
+  const cp = document.getElementById('lv-cp').value.trim();
+  const ville = document.getElementById('lv-ville').value.trim();
+  const lotSaisi = document.getElementById('lv-lot').value.trim();
+  const mtt = lireMontant(document.getElementById('lv-mtt').value);
+
+  if (!nom) { toast('Indiquez le nom de l\'adjudicataire.'); document.getElementById('lv-nom').focus(); return; }
+  if (!lotSaisi) { toast('Indiquez le lot.'); document.getElementById('lv-lot').focus(); return; }
+  if (!(mtt > 0)) { toast('Indiquez le montant.'); document.getElementById('lv-mtt').focus(); return; }
+
+  // 1) résoudre l'adjudicataire → carnet + n° de la vente
+  let carnetId = _liveCarnetId;
+  if (!carnetId) carnetId = upsertCarnet({ nom, prenom, adresse, cp, ville });
+  else { // compléter la fiche carnet si l'utilisateur a ajouté des infos
+    const c = trouverCarnet(carnetId);
+    if (c) { if (adresse && !c.adresse) c.adresse = adresse; if (cp && !c.cp) c.cp = cp; if (ville && !c.ville) c.ville = ville; if (prenom && !c.prenom) c.prenom = prenom; }
+  }
+  let num = numAdjExistant(v, carnetId);
+  if (!num) num = prochainNumAdj(v);
+  v.acheteurs[String(num)] = {
+    nom: [nom, prenom].filter(Boolean).join(' '), adresse, cp, ville,
+    mode: (v.acheteurs[String(num)] && v.acheteurs[String(num)].mode) || '',
+    regle: (v.acheteurs[String(num)] && v.acheteurs[String(num)].regle) || false,
+    carnetId,
+  };
+
+  // 2) résoudre le lot → n° + désignation
+  let lotNum = '', design = '';
+  if (_liveLotId) { const l = v.lots.find(x => x.id === _liveLotId); if (l) { lotNum = l.num; design = l.libelle; } }
+  else {
+    // saisie libre : "63 — découpeuse" ou "63" ou "découpeuse"
+    const m = lotSaisi.match(/^\s*(\d+)\s*(?:[—–-]\s*(.*))?$/);
+    if (m) { lotNum = m[1]; design = (m[2] || '').trim(); }
+    else { design = lotSaisi; }
+    // si le n° saisi correspond à un lot du catalogue, récupérer sa désignation
+    if (lotNum && !design) { const lc = v.lots.find(l => String(l.num) === String(lotNum)); if (lc) design = lc.libelle; }
+  }
+
+  v.adjudications.push({ id: uid(), lot: lotNum, designation: design, adjNum: String(num), adj: String(num), adjId: carnetId, montant: mtt, invendu: false });
+  sauver();
+
+  fermer('m-live');
+  lancerAnimationValidation();
+}
+
+// Animation : fond en opacité + rond qui se remplit en vert + particules, puis 2 choix
+function lancerAnimationValidation() {
+  const ov = document.getElementById('overlay-valid');
+  const fg = document.getElementById('ring-fg');
+  const check = document.getElementById('ring-check');
+  const txt = document.getElementById('ov-txt');
+  const choix = document.getElementById('valid-choix');
+  // reset
+  fg.style.transition = 'none'; fg.style.strokeDashoffset = '263.9';
+  check.classList.remove('vu'); choix.classList.remove('vu');
+  txt.textContent = 'Enregistrement…';
+  const anciens = ov.querySelector('.confettis'); if (anciens) anciens.remove();
+  ov.classList.add('ouvert');
+  // lance le remplissage
+  requestAnimationFrame(() => {
+    fg.style.transition = 'stroke-dashoffset .9s cubic-bezier(.35,.9,.3,1)';
+    fg.style.strokeDashoffset = '0';
+  });
+  setTimeout(() => {
+    check.classList.add('vu'); txt.textContent = 'Adjudication enregistrée';
+    // particules colorées autour du rond
+    const zone = ov.querySelector('div');
+    const conf = document.createElement('div'); conf.className = 'confettis';
+    const couleurs = ['#16a34a', '#304090', '#6e3a86', '#d1a83f', '#1e8fb8', '#16b58a'];
+    for (let i = 0; i < 22; i++) {
+      const p = document.createElement('span'); p.className = 'confetti';
+      const ang = (Math.PI * 2 * i) / 22 + Math.random() * .4;
+      const dist = 70 + Math.random() * 70;
+      p.style.cssText = `left:50%;top:50%;background:${couleurs[i % couleurs.length]};--cx:${Math.cos(ang) * dist}px;--cy:${Math.sin(ang) * dist}px;--cr:${Math.random() * 360}deg;animation-delay:${Math.random() * .12}s;`;
+      conf.appendChild(p);
+    }
+    zone.appendChild(conf);
+    if (navigator.vibrate) { try { navigator.vibrate(40); } catch (e) {} }
+  }, 700);
+  setTimeout(() => { choix.classList.add('vu'); }, 1100);
+}
+function validFin(quoi) {
+  document.getElementById('overlay-valid').classList.remove('ouvert');
+  if (quoi === 'nouveau') { ouvrirLive(); }
+  else { ongletActif = 'bord'; render(); }
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  ONGLET ENREGISTREMENTS (liste des adjudications live) + édition
+// ════════════════════════════════════════════════════════════════════
+function ecranLiveListe(v) {
+  const lignes = v.adjudications.slice().reverse().map(a => {
+    const f = v.acheteurs[String(a.adjNum || a.adj)] || {};
+    return `
+    <button class="ach-item" onclick="ouvrirEditionLigne('${a.id}')">
+      <span class="l-num">${esc(a.adjNum || a.adj || '?')}</span>
+      <span class="a-corps">
+        <div class="a-nom">Lot ${esc(a.lot || '—')} · ${esc(a.designation || '')}</div>
+        <div class="a-meta">${esc(f.nom || 'adjudicataire')}${a.invendu ? ' · invendu' : ''}</div>
+      </span>
+      <span style="font-weight:800;font-variant-numeric:tabular-nums;">${a.invendu ? '—' : eur(a.montant)}</span>
+    </button>`;
+  }).join('');
+  return `
+  ${v.cloture ? '<div class="alerte">Vente clôturée — saisie verrouillée.</div>' : `
+  <button class="btn b-live" style="background:linear-gradient(135deg,var(--etude-b1),var(--etude-b2));margin-bottom:14px;" onclick="ouvrirLive()">+ Nouvel enregistrement live</button>`}
+  <div class="bande-titre" style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);padding:0 4px 8px;">
+    <span>Enregistrements</span><span>${v.adjudications.length} ligne(s)</span>
+  </div>
+  ${lignes || '<div class="vide">Aucun enregistrement pour l\'instant.<br>Touchez « Débuter la vente live » sur le tableau de bord.</div>'}`;
+}
+
+let _ligneId = null;
+function ouvrirEditionLigne(id) {
+  const v = vente(); const a = v.adjudications.find(x => x.id === id); if (!a) return;
+  _ligneId = id;
+  // réutilise la modale édition simple
+  const modal = document.getElementById('m-edit-ligne');
+  if (!modal) { document.body.insertAdjacentHTML('beforeend', modaleEditLigneHTML()); }
+  const f = v.acheteurs[String(a.adjNum || a.adj)] || {};
+  document.getElementById('el-lot').value = a.lot || '';
+  document.getElementById('el-des').value = a.designation || '';
+  document.getElementById('el-num').value = a.adjNum || a.adj || '';
+  document.getElementById('el-nom').value = f.nom || '';
+  document.getElementById('el-mtt').value = a.montant || '';
+  document.getElementById('el-inv').checked = !!a.invendu;
+  document.getElementById('m-edit-ligne').classList.add('ouvert');
+}
+function modaleEditLigneHTML() {
+  return `
+  <div class="voile" id="m-edit-ligne">
+    <div class="feuille">
+      <div class="poignee"></div>
+      <h3>Modifier l'enregistrement</h3>
+      <div class="grille2 fgroupe">
+        <div><label>N° lot</label><input class="champ gros" id="el-lot" inputmode="numeric"></div>
+        <div><label>N° adjudicataire</label><input class="champ gros" id="el-num" inputmode="numeric"></div>
+      </div>
+      <div class="fgroupe"><label>Désignation</label><input class="champ" id="el-des"></div>
+      <div class="fgroupe"><label>Adjudicataire (nom)</label><input class="champ" id="el-nom"></div>
+      <div class="fgroupe"><label>Montant (€)</label><input class="champ gros" id="el-mtt" inputmode="decimal"></div>
+      <label style="display:flex;align-items:center;gap:9px;margin-bottom:16px;font-size:14px;color:var(--text);"><input type="checkbox" id="el-inv" style="width:19px;height:19px;"> Lot invendu</label>
+      <button class="btn" onclick="validerEditLigne()">Enregistrer</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+        <button class="btn danger-ghost petit" onclick="supprimerLigne()">Supprimer</button>
+        <button class="btn ghost petit" onclick="fermer('m-edit-ligne')">Annuler</button>
+      </div>
+    </div>
+  </div>`;
+}
+function validerEditLigne() {
+  const v = vente(); const a = v.adjudications.find(x => x.id === _ligneId); if (!a) return;
+  a.lot = document.getElementById('el-lot').value.trim();
+  a.designation = document.getElementById('el-des').value.trim();
+  const num = document.getElementById('el-num').value.trim();
+  a.adjNum = num; a.adj = num;
+  a.montant = lireMontant(document.getElementById('el-mtt').value);
+  a.invendu = document.getElementById('el-inv').checked;
+  const nom = document.getElementById('el-nom').value.trim();
+  if (num) {
+    if (!v.acheteurs[num]) v.acheteurs[num] = { nom: '', adresse: '', cp: '', ville: '', mode: '', regle: false };
+    if (nom) v.acheteurs[num].nom = nom;
+  }
+  sauver(); fermer('m-edit-ligne'); render();
+  toast('Enregistrement modifié.');
+}
+function supprimerLigne() {
+  const v = vente();
+  if (!confirm('Supprimer cet enregistrement ?')) return;
+  v.adjudications = v.adjudications.filter(x => x.id !== _ligneId);
+  sauver(); fermer('m-edit-ligne'); render();
+  toast('Enregistrement supprimé.');
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  ŒIL — visualiser les tableaux (enregistrements live / fiche lots)
+// ════════════════════════════════════════════════════════════════════
+let _tableauType = null;
+function modaleTableauHTML() {
+  return `
+  <div class="voile" id="m-tableau">
+    <div class="feuille large">
+      <div class="poignee"></div>
+      <h3 id="tbl-titre">Tableau</h3>
+      <div id="tbl-corps"></div>
+      <div id="tbl-actions" style="margin-top:14px;"></div>
+      <button class="btn ghost petit" style="margin-top:10px;" onclick="fermer('m-tableau')">Fermer</button>
+    </div>
+  </div>`;
+}
+async function ouvrirTableau(type) {
+  _tableauType = type;
+  document.getElementById('m-tableau').classList.add('ouvert');
+  await dessinerTableau();
+}
+function rafraichirTableauSiOuvert() {
+  const m = document.getElementById('m-tableau');
+  if (m && m.classList.contains('ouvert')) dessinerTableau();
+}
+async function dessinerTableau() {
+  const v = vente();
+  const titre = document.getElementById('tbl-titre');
+  const corps = document.getElementById('tbl-corps');
+  const actions = document.getElementById('tbl-actions');
+  if (_tableauType === 'lots') {
+    titre.textContent = 'Fiche des lots';
+    if (!v.lots.length) { corps.innerHTML = '<div class="vide">Aucun lot enregistré.</div>'; actions.innerHTML = ''; }
+    else {
+      const lots = v.lots.slice().sort((a, b) => (parseInt(a.num) || 0) - (parseInt(b.num) || 0));
+      let rows = '';
+      for (const l of lots) {
+        let img = '<span style="color:var(--text3);font-size:11px;">—</span>';
+        if (l.photoId) { const d = await photoGet(l.photoId); if (d) img = `<img class="mini" src="${d}" alt="">`; }
+        rows += `<tr onclick="ouvrirLot('${l.id}')"><td class="num">${esc(l.num)}</td><td>${esc(l.libelle)}</td><td class="th-photo">${img}</td></tr>`;
+      }
+      corps.innerHTML = `<div class="tbl-wrap"><table class="data"><thead><tr><th>N°</th><th>Libellé</th><th class="th-photo">Photo</th></tr></thead><tbody>${rows}</tbody></table></div><div class="note">Touchez une ligne pour modifier le lot.</div>`;
+      actions.innerHTML = `
+        <button class="btn ghost petit" onclick="exporterLotsXLSX()">${IC.partage} Exporter en Excel (.xlsx)</button>
+        <button class="btn ghost petit" style="margin-top:10px;" onclick="exporterLotsPDF()">${IC.partage} Exporter en PDF</button>`;
+    }
+  } else {
+    titre.textContent = 'Enregistrements de la vente';
+    const lignes = v.adjudications.slice().sort((a, b) => (parseInt(a.lot) || 0) - (parseInt(b.lot) || 0));
+    if (!lignes.length) { corps.innerHTML = '<div class="vide">Aucun enregistrement.</div>'; actions.innerHTML = ''; }
+    else {
+      const rows = lignes.map(a => {
+        const f = v.acheteurs[String(a.adjNum || a.adj)] || {};
+        return `<tr onclick="fermer('m-tableau');ouvrirEditionLigne('${a.id}')"><td class="num">${esc(a.lot || '—')}</td><td>${esc(a.designation || '')}</td><td class="num">${esc(a.adjNum || a.adj || '')}</td><td>${esc(f.nom || '')}</td><td class="mtt">${a.invendu ? 'Invendu' : eur(a.montant)}</td></tr>`;
+      }).join('');
+      corps.innerHTML = `<div class="tbl-wrap"><table class="data"><thead><tr><th>Lot</th><th>Désignation</th><th>N° adj.</th><th>Adjudicataire</th><th class="mtt">Montant</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+      actions.innerHTML = `<button class="btn ghost petit" onclick="exporterEnregistrementsXLSX()">${IC.partage} Exporter ce tableau (.xlsx)</button>`;
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  CLÔTURE & PV
+// ════════════════════════════════════════════════════════════════════
+function numerosAcheteurs(v) {
+  const nums = [...new Set(v.adjudications.filter(a => !a.invendu && (a.adjNum || a.adj)).map(a => String(a.adjNum || a.adj)))];
+  return nums.sort((a, b) => (parseInt(a) || 0) - (parseInt(b) || 0));
+}
+function ecranCloture(v) {
+  const vendus = v.adjudications.filter(a => !a.invendu);
+  const total = vendus.reduce((s, a) => s + a.montant, 0);
+  const nums = numerosAcheteurs(v);
+  const incomplets = nums.filter(n => !(v.acheteurs[n] && v.acheteurs[n].nom));
+  return `
+  <div class="card">
+    <div class="card-titre">Récapitulatif</div>
+    <div class="recap-ligne"><span>Lots adjugés</span><span class="v">${vendus.length}</span></div>
+    <div class="recap-ligne"><span>Lots invendus</span><span class="v">${v.adjudications.length - vendus.length}</span></div>
+    <div class="recap-ligne"><span>Lots photographiés</span><span class="v">${v.lots.length}</span></div>
+    <div class="recap-ligne"><span>Acheteurs distincts</span><span class="v">${nums.length}</span></div>
+    <div class="recap-ligne"><span>Total des adjudications</span><span class="v">${eur(total)}</span></div>
+  </div>
+  ${incomplets.length ? `<div class="alerte">⚠ ${incomplets.length} acheteur(s) sans nom : n° ${incomplets.join(', ')}. Complétez-les dans les enregistrements — sinon le PV sortira avec des cases vides.</div>` : ''}
+  <div class="card">
+    <div class="card-titre">Procès-verbal de vente</div>
+    <button class="btn btn-pv" onclick="genererPV()">${IC.partage} PV de vente — tableau (.xlsx)</button>
+    <div class="note">Le modèle exact de l'étude : N° d'ordre, désignation, acheteur, prix en lettres et en chiffres, calculs TVA automatiques et sceau.</div>
+    <button class="btn" style="margin-top:12px;background:linear-gradient(135deg,#1d4ed8,#3b6fe0);" onclick="exporterPVEcritWord()">${IC.partage} PV de vente écrit (Word)</button>
+    <button class="btn ghost petit" style="margin-top:10px;" onclick="exporterPVEcritPDF()">${IC.partage} PV de vente écrit (PDF)</button>
+    <div class="note">Le procès-verbal rédigé (page de garde) : requête du mandataire, commissaire, conditions de vente — rempli automatiquement.</div>
+  </div>
+  <div class="card">
+    <div class="card-titre">Exports de la vente</div>
+    <button class="btn ghost petit" onclick="exporterLotsXLSX()">${IC.partage} Fiche des lots par e-mail (.xlsx)</button>
+    <button class="btn ghost petit" style="margin-top:10px;" onclick="exporterLotsPDF()">${IC.partage} Fiche des lots par e-mail (PDF)</button>
+    <button class="btn ghost petit" style="margin-top:10px;" onclick="exporterAdjVente()">${IC.partage} Fiche adjudicataires de la vente (.xlsx)</button>
+  </div>
+  <div class="card">
+    <div class="card-titre">Sécurité</div>
+    ${v.cloture
+      ? `<button class="btn ghost" onclick="basculerCloture(false)">Rouvrir la saisie</button>`
+      : `<button class="btn" style="background:var(--nuit);" onclick="basculerCloture(true)">Clôturer la vente (verrouiller la saisie)</button>`}
+    <button class="btn ghost petit" style="margin-top:10px;" onclick="exporterSecours()">${IC.partage} Sauvegarde d'urgence (.json)</button>
+    <button class="btn danger-ghost petit" style="margin-top:10px;" onclick="supprimerVente()">Supprimer cette vente du téléphone</button>
+  </div>`;
+}
+function basculerCloture(val) { const v = vente(); v.cloture = val; sauver(); render(); toast(val ? 'Vente clôturée — saisie verrouillée.' : 'Saisie rouverte.'); }
+async function supprimerVente() {
+  const v = vente();
+  if (!confirm(`Supprimer « ${v.nom} » du téléphone ?\n\nAssurez-vous d'avoir envoyé le PV avant. Cette action est irréversible.`)) return;
+  for (const l of v.lots) { if (l.photoId) await photoDel(l.photoId); }
+  etat.ventes = etat.ventes.filter(x => x.id !== v.id);
+  sauver(); retourAccueil();
+  toast('Vente supprimée du téléphone.');
+}
+
+// ─── Montant en toutes lettres (français) ───
+function enLettres(n) {
+  n = Math.floor(Math.abs(n));
+  if (n === 0) return 'Zéro';
+  const u = ['', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf', 'dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize', 'dix-sept', 'dix-huit', 'dix-neuf'];
+  const d = ['', '', 'vingt', 'trente', 'quarante', 'cinquante', 'soixante', 'soixante', 'quatre-vingt', 'quatre-vingt'];
+  function centaines(x) {
+    let s = ''; const c = Math.floor(x / 100), r = x % 100;
+    if (c) s = (c > 1 ? u[c] + ' ' : '') + 'cent' + (c > 1 && r === 0 ? 's' : '');
+    if (r) {
+      if (s) s += ' ';
+      if (r < 20) s += u[r];
+      else {
+        const dz = Math.floor(r / 10), un = r % 10;
+        if (dz === 7 || dz === 9) { const base = d[dz], reste = r - (dz === 7 ? 60 : 80); s += base + (reste === 11 && dz === 7 ? ' et ' : '-') + u[reste]; if (dz === 7 && reste === 11) s = s.replace('-onze', 'onze'); }
+        else { s += d[dz]; if (un === 1 && dz !== 8) s += ' et un'; else if (un) s += '-' + u[un]; else if (dz === 8) s += 's'; }
+      }
+    }
+    return s;
+  }
+  let mots = '';
+  const millions = Math.floor(n / 1000000), milliers = Math.floor((n % 1000000) / 1000), reste = n % 1000;
+  if (millions) mots += centaines(millions) + ' million' + (millions > 1 ? 's' : '');
+  if (milliers) mots += (mots ? ' ' : '') + (milliers === 1 ? 'mille' : centaines(milliers) + ' mille');
+  if (reste) mots += (mots ? ' ' : '') + centaines(reste);
+  mots = mots.replace(/quatre-vingts mille/, 'quatre-vingt mille').replace(/cents mille/, 'cent mille');
+  return mots.charAt(0).toUpperCase() + mots.slice(1);
+}
+function montantEnLettres(m) {
+  const ent = Math.floor(m), cents = Math.round((m - ent) * 100);
+  if (!cents) return enLettres(ent);
+  return enLettres(ent) + ' euros ' + enLettres(cents).toLowerCase() + ' centimes';
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  GÉNÉRATION DU PV (Excel — format compatible import Auctio PC)
+// ════════════════════════════════════════════════════════════════════
+//  Chargement d'images en base64 (logo, sceau) pour les documents générés
+// ════════════════════════════════════════════════════════════════════
+const _imgCache = {};
+async function imageBase64(src) {
+  if (_imgCache[src]) return _imgCache[src];
+  // 1) tentative via fetch (fonctionne en https / PWA installée)
+  try {
+    const rep = await fetch(src);
+    if (rep.ok) {
+      const blob = await rep.blob();
+      _imgCache[src] = await new Promise((res) => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(blob); });
+      return _imgCache[src];
+    }
+  } catch (e) {}
+  // 2) repli : charger l'image et la passer par un canvas
+  try {
+    _imgCache[src] = await new Promise((res, rej) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight;
+        c.getContext('2d').drawImage(img, 0, 0);
+        try { res(c.toDataURL('image/png')); } catch (e) { rej(e); }
+      };
+      img.onerror = rej;
+      img.src = src;
+    });
+    return _imgCache[src];
+  } catch (e) { return null; }
+}
+function logoBase64() { return imageBase64('logo-etude.png'); }
+function sceauBase64() { return imageBase64('sceau-etude.png'); }
+
+// ════════════════════════════════════════════════════════════════════
+//  PROCÈS-VERBAL DE VENTE (Excel) — reproduction exacte du modèle de l'étude
+//  Colonnes : N° d'ordre (= n° de lot) · Désignation · Nom et adresse ·
+//  Prix en toutes lettres / en chiffres. Bloc TVA/HT/TTC calculé.
+//  Sceau de l'étude sous « COMMISSAIRE DE JUSTICE ». Pas de logo en tête.
+// ════════════════════════════════════════════════════════════════════
+async function genererPV() {
+  const v = vente();
+  const vendus = v.adjudications.filter(a => !a.invendu);
+  if (!vendus.length) { toast('Aucun lot adjugé — rien à mettre au PV.'); return; }
+  const lignes = vendus.slice().sort((a, b) => (parseInt(a.lot) || 0) - (parseInt(b.lot) || 0));
+  // Garde-fou : ExcelJS absent (fichier exceljs.min.js manquant sur le site)
+  if (typeof ExcelJS === 'undefined') {
+    toast('exceljs.min.js manquant sur le site — PV généré en version simple.');
+    return genererPVSimple(v, lignes);
+  }
+  toast('Génération du procès-verbal…');
+
+  const wb = new ExcelJS.Workbook();
+  const ws = wb.addWorksheet('Feuil1', { pageSetup: { paperSize: 9, orientation: 'portrait', margins: { left: 0.47, right: 0.47, top: 0.52, bottom: 0.52, header: 0.3, footer: 0.3 } } });
+  // Largeurs exactes du modèle
+  ws.columns = [{ width: 6.7 }, { width: 25.7 }, { width: 25.7 }, { width: 25.7 }, { width: 10.7 }];
+
+  const M = { style: 'medium' }, T = { style: 'thin' };
+  const AR = (sz, o) => Object.assign({ name: 'Arial', size: sz }, o || {});
+  const CC = { horizontal: 'center', vertical: 'center' };
+
+  // ── En-tête du tableau (2 lignes, fusions verticales comme le modèle) ──
+  ws.mergeCells('A1:A2'); ws.mergeCells('B1:B2'); ws.mergeCells('C1:C2'); ws.mergeCells('D1:E1');
+  ws.getCell('A1').value = "N° d'ordre";
+  ws.getCell('B1').value = "Désignation de l'objet à vendre";
+  ws.getCell('C1').value = "Nom et adresse de l'acheteur";
+  ws.getCell('D1').value = 'Prix de vente en Euros';
+  ws.getCell('D2').value = 'En toutes lettres';
+  ws.getCell('E2').value = 'En chiffres';
+  ['A1', 'B1', 'C1', 'D1', 'D2', 'E2'].forEach(ref => {
+    const c = ws.getCell(ref); c.font = AR(9, { bold: true });
+    c.alignment = Object.assign({}, CC, { wrapText: ref === 'A1' });
+    c.border = { top: M, bottom: M, left: M, right: M };
+  });
+  ws.getRow(1).height = 20.1; ws.getRow(2).height = 20.1;
+
+  // ── Corps : une ligne par lot adjugé ──
+  let r = 3; const first = r;
+  lignes.forEach(a => {
+    const f = v.acheteurs[String(a.adjNum || a.adj)] || {};
+    const adrParts = [f.adresse, [f.cp, f.ville].filter(Boolean).join(' ')].filter(Boolean).join(' ');
+    const nomAdresse = f.nom ? (f.nom + (adrParts ? ', ' + adrParts : '')) : '';
+    ws.getCell(`A${r}`).value = parseInt(a.lot, 10) || a.lot;      // N° d'ordre = n° de lot
+    ws.getCell(`B${r}`).value = a.designation || '';
+    ws.getCell(`C${r}`).value = nomAdresse;
+    ws.getCell(`D${r}`).value = montantEnLettres(a.montant);
+    ws.getCell(`E${r}`).value = a.montant;
+    // polices du modèle : A/D/E Arial 10, B Arial 9, C Arial 8
+    ws.getCell(`A${r}`).font = AR(10); ws.getCell(`B${r}`).font = AR(9);
+    ws.getCell(`C${r}`).font = AR(8); ws.getCell(`D${r}`).font = AR(10); ws.getCell(`E${r}`).font = AR(10);
+    for (let c = 1; c <= 5; c++) {
+      const cell = ws.getCell(r, c);
+      cell.alignment = Object.assign({}, CC, { wrapText: c === 1 || c === 2 || c === 3 });
+      cell.border = { left: M, right: M, top: T, bottom: T };
+    }
+    ws.getRow(r).height = 20.1; r++;
+  });
+  const last = r - 1;
+
+  // ── TOTAL ──
+  ws.getCell(`D${r}`).value = 'TOTAL'; ws.getCell(`D${r}`).font = AR(10, { bold: true }); ws.getCell(`D${r}`).alignment = CC;
+  ws.getCell(`E${r}`).value = { formula: `SUM(E${first}:E${last})` }; ws.getCell(`E${r}`).font = AR(10, { bold: true }); ws.getCell(`E${r}`).alignment = CC;
+  ['A', 'B', 'C', 'D', 'E'].forEach(col => { ws.getCell(`${col}${r}`).border = { top: T, bottom: M, left: M, right: M }; });
+  const rTotal = r; ws.getRow(r).height = 20.1;
+
+  // ── Mention TVA + bloc calculs (espacements relatifs du modèle) ──
+  const rMention = rTotal + 10;
+  ws.mergeCells(`B${rMention}:C${rMention}`);
+  ws.getCell(`B${rMention}`).value = 'Il est précisé que la TVA sera payée ultérieurement.';
+  ws.getCell(`B${rMention}`).font = AR(10); ws.getCell(`B${rMention}`).alignment = CC;
+
+  const rHT = rTotal + 12, rTVA1 = rHT + 1, rBase = rHT + 2, rFrais = rHT + 3, rTVA2 = rHT + 4, rTTC = rHT + 5;
+  const put = (row, label, val) => {
+    ws.getCell(`B${row}`).value = label; ws.getCell(`B${row}`).font = AR(10); ws.getCell(`B${row}`).alignment = CC;
+    ws.getCell(`C${row}`).value = val; ws.getCell(`C${row}`).font = AR(10); ws.getCell(`C${row}`).alignment = CC;
+    ws.getCell(`C${row}`).numFmt = '#,##0.00';
+  };
+  put(rHT, 'PRODUIT VENTE HT', { formula: `C${rBase}/1.2` });
+  put(rTVA1, 'TVA 20 %', { formula: `C${rHT}*0.2` });
+  // la base = total des adjudications (liée au TOTAL du tableau)
+  ws.getCell(`C${rBase}`).value = { formula: `E${rTotal}` };
+  ws.getCell(`C${rBase}`).font = AR(10); ws.getCell(`C${rBase}`).alignment = CC; ws.getCell(`C${rBase}`).numFmt = '#,##0.00';
+  put(rFrais, 'FRAIS HT', { formula: `(C${rTTC}-C${rBase})/1.2` });
+  put(rTVA2, 'TVA 20 %', { formula: `C${rFrais}*0.2` });
+  put(rTTC, 'TOTAL TTC', { formula: `C${rBase}*1.1428` });
+
+  // ── DONT ACTE + phrase + COMMISSAIRE DE JUSTICE + sceau ──
+  const rActe = rTotal + 19;
+  ws.mergeCells(`B${rActe}:C${rActe}`);
+  ws.getCell(`B${rActe}`).value = 'DONT ACTE - SOUS TOUTES RESERVES';
+  ws.getCell(`B${rActe}`).font = AR(10); ws.getCell(`B${rActe}`).alignment = CC;
+
+  const rPhrase = rTotal + 21;
+  ws.mergeCells(`A${rPhrase}:E${rPhrase}`);
+  ws.getCell(`A${rPhrase}`).value = "Que j'ai seul signé, les acquéreurs ayant quitté les lieux avant la clôture du présent procès - verbal.";
+  ws.getCell(`A${rPhrase}`).font = AR(10); ws.getCell(`A${rPhrase}`).alignment = Object.assign({}, CC, { wrapText: true });
+
+  const rComm = rTotal + 24;
+  ws.getCell(`D${rComm}`).value = 'COMMISSAIRE DE JUSTICE';
+  ws.getCell(`D${rComm}`).font = AR(10); ws.getCell(`D${rComm}`).alignment = CC;
+
+  // Sceau de l'étude sous « COMMISSAIRE DE JUSTICE »
+  const sceau = await sceauBase64();
+  if (sceau) {
+    const imgId = wb.addImage({ base64: sceau, extension: 'png' });
+    ws.addImage(imgId, { tl: { col: 3.15, row: rComm + 0.4 }, ext: { width: 105, height: 105 } });
+  }
+
+  const buf = await wb.xlsx.writeBuffer();
+  const nomFichier = 'Procès-verbal de vente du ' + dateFR(v.date).replace(/\//g, '_') + '.xlsx';
+  partagerFichier(new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), nomFichier);
+}
+
+// ─── PV de secours (SheetJS, sans mise en forme — utilisé seulement si exceljs.min.js manque) ───
+function genererPVSimple(v, lignes) {
+  const total = lignes.reduce((s, a) => s + a.montant, 0);
+  const aoa = [];
+  aoa.push(["N° d'ordre", "Désignation de l'objet à vendre", "Nom et adresse de l'acheteur", 'Prix de vente en Euros', '']);
+  aoa.push(['', '', '', 'En toutes lettres', 'En chiffres']);
+  lignes.forEach(a => {
+    const f = v.acheteurs[String(a.adjNum || a.adj)] || {};
+    const adrParts = [f.adresse, [f.cp, f.ville].filter(Boolean).join(' ')].filter(Boolean).join(' ');
+    const nomAdresse = f.nom ? (f.nom + (adrParts ? ', ' + adrParts : '')) : '';
+    aoa.push([parseInt(a.lot, 10) || a.lot, a.designation || '', nomAdresse, montantEnLettres(a.montant), a.montant]);
+  });
+  aoa.push(['', '', '', 'TOTAL', total]);
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols'] = [{ wch: 7 }, { wch: 26 }, { wch: 26 }, { wch: 26 }, { wch: 11 }];
+  const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Feuil1');
+  const data = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
+  partagerFichier(new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), 'Procès-verbal de vente du ' + dateFR(v.date).replace(/\//g, '_') + '.xlsx');
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  PROCÈS-VERBAL DE VENTE ÉCRIT (Word / PDF) — reproduction du modèle
+//  avec variables : année/jour en lettres, mandataire, commissaire
+//  (accord masculin/féminin), lieu, nature, date de publication.
+// ════════════════════════════════════════════════════════════════════
+const JOURS_SEMAINE = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+const MOIS_FR = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+function majChaqueMot(s) { return s.split(/[\s-]+/).map(m => m.charAt(0).toUpperCase() + m.slice(1)).join(' '); }
+// "L'an Deux Mil Vingt Six et le Sept (07) Juillet"
+function anEtJourEnLettres(iso) {
+  const [y, m, d] = iso.split('-').map(Number);
+  const annee = 'Deux Mil' + (y % 2000 ? ' ' + majChaqueMot(enLettres(y % 2000).toLowerCase()) : '');
+  const jour = majChaqueMot(enLettres(d).toLowerCase()) + ' (' + String(d).padStart(2, '0') + ')';
+  const mois = majChaqueMot(MOIS_FR[m - 1]);
+  return `L'an ${annee} et le ${jour} ${mois}`;
+}
+// "Mardi 7 juillet 2026"
+function dateLonguePV(iso) {
+  if (!iso) return '';
+  const [y, m, d] = iso.split('-').map(Number);
+  const dt = new Date(y, m - 1, d);
+  return `${JOURS_SEMAINE[dt.getDay()]} ${d} ${MOIS_FR[m - 1]} ${y}`;
+}
+// accord de la nature : "du matériel" / "des véhicules" / "du [libre]"
+function natureAccordee(nature) {
+  const n = (nature || 'matériel').toLowerCase();
+  if (n.indexOf('véhicule') !== -1) return 'des véhicules ci-après désignés';
+  if (n === 'matériel' || n === 'materiel') return 'du matériel ci-après désignés';
+  return 'de ' + (nature || '') + ' ci-après désignés';
+}
+
+// Corps HTML du PV écrit (partagé Word / PDF) — mise en page du modèle :
+// en-tête encadré à gauche · titre centré · corps indenté à 4 cm ·
+// « Du (date) » en marge gauche · points de suite · conditions numérotées 1-7
+function pvEcritHTML(v, pourWord) {
+  const estFemme = /KESSER/i.test(v.commissaire || '');
+  const soussigne = estFemme ? 'Je soussignée' : 'Je soussigné';
+  const transporte = estFemme ? 'transportée' : 'transporté';
+  const commissaireLong = (v.commissaire || '').replace(/^Me\s+/i, 'Maître ');
+  const requete = texteRequete(v);
+  const pub = v.datePublication ? dateLonguePV(v.datePublication) : '';
+  const pts = (n) => `<span class="pts">${'.'.repeat(n)}</span>`;
+  const conditions = [
+    "Les objets seront vendus dans l'état où ils se trouvent, sans aucune garantie ni de qualité, ni de quantité, ni de défauts cachés, apparents ou rédhibitoires.",
+    "Indépendamment du prix, les acquéreurs paieront pour frais les honoraires de l'Officier ministériel ainsi que les frais d'enregistrement.",
+    "Le tout est payable comptant entre les mains du commissaire de justice instrumentaire.",
+    "Le vendeur se réserve le droit de propriété sur les objets vendus jusqu'à parfait paiement.",
+    "Au cas d'adjudication sur la même mise faite par plusieurs enchérisseurs l'adjudication sera annulée et les enchères seront reprises à partir de la mise précédente.",
+    "Les objets adjugés doivent être enlevés immédiatement.",
+    "Si l'acheteur ne prend pas livraison immédiatement, l'objet adjugé pourra être remis en vente à ses risques et périls sans que l'acheteur puisse concourir aux nouvelles enchères.",
+  ];
+
+  return `
+  <div class="entete">
+    <p><b>SCP Jean-Luc COPI et Marine KESSER</b></p>
+    <p><b>Commissaires de Justice Associés</b></p>
+    <p><b>36 rue Paul Cézanne</b></p>
+    <p><b>BP 1043</b></p>
+    <p><b>68050 MULHOUSE CEDEX</b></p>
+    <p><b>Tél&nbsp;: 03.89.45.62.72</b></p>
+    <p><b>Fax&nbsp;: 03.89.45.59.36</b></p>
+    <p><b>CCP STRASBOURG 3222 04 G</b></p>
+  </div>
+  <p class="titre"><b><u>Procès –Verbal de Vente</u></b></p>
+  <p class="corps">${esc(anEtJourEnLettres(v.date))}&nbsp;${pts(42)}</p>
+  <table class="treq" cellspacing="0" cellpadding="0"><tr>
+    <td class="tmarge"><u>Du ${esc(dateFR(v.date))}</u></td>
+    <td class="tcorps">A la requête de ${esc(requete)}&nbsp;${pts(24)}</td>
+  </tr></table>
+  <p class="corps">${soussigne}, ${esc(commissaireLong)}, Commissaire de Justice à 68100 MULHOUSE y demeurant 36 rue Paul Cézanne, me suis ${transporte} aujourd'hui ${esc(dateLonguePV(v.date))}&nbsp;${pts(20)}</p>
+  <p class="corps">Au ${esc(v.lieu || '')},&nbsp;${pts(40)}</p>
+  <p class="corps">à l'effet de procéder à la vente aux enchères publiques ${esc(natureAccordee(v.nature))}, après publication dans le journal L'Alsace du ${esc(pub)} sous les conditions suivantes, qui ont été portées à la connaissance des amateurs réunis, savoir&nbsp;:</p>
+  ${conditions.map((c, i) => `<p class="cond"><span class="cnum">${i + 1}.</span>&nbsp;${c}</p>`).join('')}
+  <p class="corps" style="margin-top:6pt;">Ensuite, il a été procédé à la vente et adjugé comme il suit&nbsp;:</p>`;
+}
+
+// Enveloppe complète (styles inclus) — mso pour Word, standard pour le PDF
+// Marges et retraits repris du modèle : page 1 cm / 1,3 cm ; corps indenté 4 cm.
+function pvEcritDocumentHTML(v, pourWord) {
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8">
+  ${pourWord ? '<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->' : ''}
+  <style>
+    @page { size: A4 portrait; margin: 1.3cm 1cm 1.2cm 1cm; }
+    body { font-family: 'Times New Roman', Times, serif; color: #000; margin: 0; font-size: 13pt; }
+    /* En-tête : bloc encadré à gauche */
+    .entete { width: 7.6cm; border: 1.5pt solid #000; padding: 6pt 4pt; }
+    .entete p { text-align: center; margin: 0; font-size: 11pt; line-height: 1.22; }
+    /* Titre centré */
+    .titre { text-align: center; font-size: 19pt; margin: 14pt 0 12pt; }
+    /* Corps : indenté à 4 cm, justifié, points de suite en fin de ligne */
+    .corps { text-align: justify; margin: 0 0.4cm 5pt 4cm; line-height: 1.18; }
+    .pts { letter-spacing: 1.5px; word-break: break-all; }
+    /* Ligne « Du (date) … A la requête » : date dans la marge gauche */
+    .treq { width: 100%; border-collapse: collapse; margin: 0 0 5pt; }
+    .treq td { vertical-align: top; font-size: 13pt; }
+    .tmarge { width: 4cm; padding-right: 0.3cm; }
+    .tcorps { text-align: justify; padding-right: 0.4cm; line-height: 1.18; }
+    /* Conditions numérotées 1-7 */
+    .cond { text-align: justify; margin: 0 0.4cm 3pt 5cm; text-indent: -1cm; line-height: 1.16; font-size: 12.5pt; }
+    .cnum { font-weight: bold; }
+  </style></head><body>${pvEcritHTML(v, pourWord)}</body></html>`;
+}
+
+// Export Word (.doc HTML — s'ouvre dans Word avec la mise en forme)
+function exporterPVEcritWord() {
+  const v = vente();
+  if (!v.date) { toast('La vente n\'a pas de date.'); return; }
+  toast('Génération du PV écrit (Word)…');
+  const html = pvEcritDocumentHTML(v, true);
+  const blob = new Blob(['\ufeff' + html], { type: 'application/msword' });
+  partagerFichier(blob, 'Procès-verbal de vente du ' + dateFR(v.date).replace(/\//g, '_') + '.doc');
+}
+// Export PDF (impression via iframe cachée)
+function exporterPVEcritPDF() {
+  const v = vente();
+  if (!v.date) { toast('La vente n\'a pas de date.'); return; }
+  toast('Préparation du PV écrit (PDF)…');
+  imprimerHTML(pvEcritDocumentHTML(v, false));
+}
+
+// ─── Export : fiche des lots en Excel AVEC vraies photos intégrées (ExcelJS) ───
+async function exporterLotsXLSX() {
+  const v = vente();
+  if (!v.lots.length) { toast('Aucun lot à exporter.'); return; }
+  // Garde-fou : ExcelJS absent → impossible d'intégrer les photos
+  if (typeof ExcelJS === 'undefined') {
+    toast('exceljs.min.js manquant sur le site — utilisez l\'export PDF pour les photos.');
+    return;
+  }
+  const lots = v.lots.slice().sort((a, b) => (parseInt(a.num) || 0) - (parseInt(b.num) || 0));
+  toast('Génération de la fiche des lots…');
+
+  const wb = new ExcelJS.Workbook();
+  const ws = wb.addWorksheet('Lots');
+  ws.columns = [{ width: 10 }, { width: 50 }, { width: 26 }];
+  const M = { style: 'medium' }, T = { style: 'thin' }, AR = (o) => Object.assign({ name: 'Arial', size: 10 }, o || {});
+
+  // Titre
+  ws.mergeCells('A1:C1');
+  ws.getCell('A1').value = 'Fiche des lots — ' + v.nom + ' (' + dateFR(v.date) + ')';
+  ws.getCell('A1').font = AR({ size: 12, bold: true }); ws.getCell('A1').alignment = { horizontal: 'left', vertical: 'center' };
+  ws.getRow(1).height = 22;
+  // En-têtes
+  const H = 3;
+  ['N° de lot', 'Libellé', 'Photo'].forEach((t, i) => {
+    const c = ws.getCell(H, i + 1); c.value = t; c.font = AR({ bold: true });
+    c.alignment = { horizontal: 'center', vertical: 'center' }; c.border = { top: M, bottom: M, left: M, right: M };
+  });
+  ws.getRow(H).height = 18;
+
+  // Lignes + images
+  let r = H + 1;
+  for (const l of lots) {
+    ws.getCell(`A${r}`).value = parseInt(l.num, 10) || l.num;
+    ws.getCell(`B${r}`).value = l.libelle;
+    [1, 2, 3].forEach(c => { const cell = ws.getCell(r, c); cell.font = AR(); cell.alignment = { horizontal: c === 2 ? 'left' : 'center', vertical: 'center', wrapText: c === 2 }; cell.border = { top: T, bottom: T, left: M, right: M }; });
+    let h = 20;
+    if (l.photoId) {
+      const d = await photoGet(l.photoId);
+      if (d) {
+        try {
+          const ext = d.indexOf('image/png') !== -1 ? 'png' : 'jpeg';
+          const imgId = wb.addImage({ base64: d, extension: ext });
+          // image dans la colonne C (index 2), avec petite marge
+          ws.addImage(imgId, { tl: { col: 2.1, row: r - 1 + 0.1 }, ext: { width: 150, height: 110 } });
+          h = 90;
+        } catch (e) {}
+      }
+    }
+    ws.getRow(r).height = h;
+    r++;
+  }
+  const buf = await wb.xlsx.writeBuffer();
+  partagerFichier(new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), 'Fiche des lots - ' + (v.nom || 'vente').replace(/[^\w-]/g, '_') + '.xlsx');
+}
+
+// ─── Export : fiche des lots en PDF (impression via iframe cachée, sans popup) ───
+async function exporterLotsPDF() {
+  const v = vente();
+  if (!v.lots.length) { toast('Aucun lot à exporter.'); return; }
+  const lots = v.lots.slice().sort((a, b) => (parseInt(a.num) || 0) - (parseInt(b.num) || 0));
+  toast('Préparation du PDF…');
+  const b64 = await logoBase64();
+  const cartes = [];
+  for (const l of lots) {
+    let img = '';
+    if (l.photoId) { const d = await photoGet(l.photoId); if (d) img = `<img src="${d}">`; }
+    cartes.push(`<div class="lot"><div class="ph">${img || '<span class="np">Sans photo</span>'}</div><div class="lg"><div class="n">Lot ${esc(l.num)}</div><div class="d">${esc(l.libelle)}</div></div></div>`);
+  }
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Fiche des lots</title>
+  <style>
+    @page { margin: 12mm; }
+    body { font-family: -apple-system, 'Segoe UI', sans-serif; color:#23253f; margin:0; }
+    .head { display:flex; align-items:center; gap:14px; margin-bottom:14px; }
+    .head img { height:46px; }
+    h1 { font-size: 17px; margin: 0; }
+    .sub { color:#565b80; font-size: 12px; }
+    .grille { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .lot { border:1px solid #d7dae8; border-radius:10px; overflow:hidden; page-break-inside: avoid; }
+    .ph { height: 155px; background:#f3f4fb; display:flex; align-items:center; justify-content:center; }
+    .ph img { width:100%; height:100%; object-fit: cover; }
+    .np { color:#9094b4; font-size:12px; }
+    .lg { padding: 8px 10px; }
+    .lg .n { font-weight:800; color:#304090; font-size:13px; }
+    .lg .d { font-size:13px; margin-top:2px; }
+  </style></head><body>
+    <div class="head">${b64 ? `<img src="${b64}">` : ''}<div><h1>Fiche des lots — ${esc(v.nom)}</h1><div class="sub">${dateFR(v.date)}${v.lieu ? ' · ' + esc(v.lieu) : ''} · ${v.lots.length} lot(s)</div></div></div>
+    <div class="grille">${cartes.join('')}</div>
+  </body></html>`;
+  imprimerHTML(html);
+}
+
+// Impression via iframe cachée (pas de popup bloquée par Safari)
+function imprimerHTML(html) {
+  const ancienne = document.getElementById('iframe-print');
+  if (ancienne) ancienne.remove();
+  const ifr = document.createElement('iframe');
+  ifr.id = 'iframe-print';
+  ifr.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;';
+  document.body.appendChild(ifr);
+  const doc = ifr.contentWindow.document;
+  doc.open(); doc.write(html); doc.close();
+  const lancer = () => {
+    try { ifr.contentWindow.focus(); ifr.contentWindow.print(); }
+    catch (e) { toast('Impression indisponible sur cet appareil.'); }
+  };
+  // laisser le temps aux images de se charger
+  if (ifr.contentWindow.document.readyState === 'complete') setTimeout(lancer, 400);
+  else ifr.onload = () => setTimeout(lancer, 400);
+}
+
+// ─── Export : tableau des enregistrements (.xlsx) ───
+function exporterEnregistrementsXLSX() {
+  const v = vente();
+  const lignes = v.adjudications.slice().sort((a, b) => (parseInt(a.lot) || 0) - (parseInt(b.lot) || 0));
+  if (!lignes.length) { toast('Aucun enregistrement.'); return; }
+  const aoa = [['Enregistrements — ' + v.nom + ' (' + dateFR(v.date) + ')'], [], ['Lot', 'Désignation', 'N° adj.', 'Adjudicataire', 'Montant', 'Statut']];
+  lignes.forEach(a => { const f = v.acheteurs[String(a.adjNum || a.adj)] || {}; aoa.push([parseInt(a.lot) || a.lot, a.designation || '', parseInt(a.adjNum || a.adj) || (a.adjNum || a.adj), f.nom || '', a.invendu ? '' : a.montant, a.invendu ? 'Invendu' : 'Adjugé']); });
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols'] = [{ wch: 8 }, { wch: 40 }, { wch: 9 }, { wch: 30 }, { wch: 12 }, { wch: 10 }];
+  const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Enregistrements');
+  const data = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
+  partagerFichier(new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), 'Enregistrements - ' + (v.nom || 'vente').replace(/[^\w-]/g, '_') + '.xlsx');
+}
+
+// ─── Export : fiche adjudicataires de la vente (.xlsx) ───
+function exporterAdjVente() {
+  const v = vente();
+  const nums = numerosAcheteurs(v);
+  if (!nums.length) { toast('Aucun adjudicataire.'); return; }
+  const aoa = [['Adjudicataires — ' + v.nom + ' (' + dateFR(v.date) + ')'], [], ['N° adj.', 'Nom', 'Adresse', 'CP', 'Ville', 'Lots', 'Total', 'Réglé', 'Mode']];
+  nums.forEach(n => {
+    const f = v.acheteurs[n] || {};
+    const lots = v.adjudications.filter(a => !a.invendu && String(a.adjNum || a.adj) === n);
+    const tot = lots.reduce((s, a) => s + a.montant, 0);
+    aoa.push([parseInt(n) || n, f.nom || '', f.adresse || '', f.cp || '', f.ville || '', lots.length, tot, f.regle ? 'Oui' : 'Non', f.mode || '']);
+  });
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols'] = [{ wch: 8 }, { wch: 28 }, { wch: 32 }, { wch: 8 }, { wch: 20 }, { wch: 7 }, { wch: 12 }, { wch: 8 }, { wch: 8 }];
+  const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Adjudicataires');
+  const data = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
+  partagerFichier(new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), 'Adjudicataires - ' + (v.nom || 'vente').replace(/[^\w-]/g, '_') + '.xlsx');
+}
+
+// ─── Export : carnet général des adjudicataires (.xlsx) ───
+function exporterCarnet() {
+  if (!etat.carnet.length) { toast('Le carnet est vide.'); return; }
+  const aoa = [['Carnet général des adjudicataires — Étude Copi & Kesser'], [], ['Nom', 'Prénom', 'Adresse', 'CP', 'Ville', 'E-mail', 'Téléphone']];
+  etat.carnet.slice().sort((a, b) => carnetLabel(a).localeCompare(carnetLabel(b))).forEach(c => aoa.push([c.nom || '', c.prenom || '', c.adresse || '', c.cp || '', c.ville || '', c.mail || '', c.tel || '']));
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols'] = [{ wch: 24 }, { wch: 18 }, { wch: 34 }, { wch: 8 }, { wch: 20 }, { wch: 26 }, { wch: 16 }];
+  const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Carnet');
+  const data = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
+  partagerFichier(new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), 'Carnet adjudicataires.xlsx');
+}
+
+// ─── Sauvegarde d'urgence (.json) ───
+function exporterSecours() {
+  const v = vente();
+  const blob = new Blob([JSON.stringify(v, null, 1)], { type: 'application/json' });
+  partagerFichier(blob, 'Auctio-vente-' + (v.nom || 'x').replace(/[^\w-]/g, '_') + '.json');
+}
+
+// ─── Partage via la feuille iOS (Mail…) — repli : téléchargement ───
+async function partagerFichier(blob, nom) {
+  try {
+    const fichier = new File([blob], nom, { type: blob.type });
+    if (navigator.canShare && navigator.canShare({ files: [fichier] })) {
+      await navigator.share({ files: [fichier], title: nom });
+      toast('Fichier prêt — choisissez Mail dans le partage.');
+      return;
+    }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = nom;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  toast('Fichier téléchargé.');
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  DÉMARRAGE
+// ════════════════════════════════════════════════════════════════════
+charger();
+// Fermeture de toute modale d'un toucher en dehors de la feuille
+document.addEventListener('click', (e) => {
+  if (e.target.classList && e.target.classList.contains('voile') && e.target.classList.contains('ouvert')) {
+    e.target.classList.remove('ouvert');
+  }
+});
+// L'écran Bienvenue (toucher pour entrer) est toujours le point d'entrée.
+// Si le code est mémorisé, le toucher enchaîne directement sur l'animation.
+render();
+// précharge le logo en base64 pour les exports (silencieux)
+logoBase64();
+// Contrôle d'intégrité : signaler clairement si un fichier de l'app manque en ligne
+setTimeout(() => {
+  if (typeof ExcelJS === 'undefined') toast('⚠ exceljs.min.js absent du site — le PV et la fiche des lots seront en version simplifiée.');
+}, 4000);
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+}
+</script>
+</body>
+</html>
